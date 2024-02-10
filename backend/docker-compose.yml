@@ -5,6 +5,7 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./scripts:/app/scripts:cached
+      - ./credential.json:/app/credential.json:cached
     ports:
       - "8000:80"
     environment:
