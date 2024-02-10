@@ -11,31 +11,67 @@ resource "google_compute_global_address" "cdn_ip" {
 # url map
 resource "google_compute_url_map" "http_lb" {
   name = "http-lb"
-  default_service = google_compute_backend_service.backend.id
-  host_rule {
-    hosts = ["*"]
-    path_matcher = "allpaths"
-  }
-  path_matcher {
-    name = "allpaths"
-    default_service = google_compute_backend_service.backend.id
-    path_rule {
-      paths = ["/*"]
-      service = google_compute_backend_service.backend.id
-    }
-	}
+  default_service = google_compute_backend_service.group.id
+   host_rule {
+     hosts = ["share-engine.click"]
+     path_matcher = "allpaths"
+   }
+   path_matcher {
+     name = "allpaths"
+     default_service = google_compute_backend_service.group.id
+     path_rule {
+       paths = ["/api/v1/*"]
+       service = google_compute_backend_service.group.id
+     }
+	 	path_rule {
+       paths = ["/*"]
+       service = google_compute_backend_bucket.default.id
+     }
+	 }
 }
 
-resource "google_compute_backend_service" "backend" {
-  name      = "cloudrun-backend"
+# backend bucket with cdn policy with default ttl settings
+resource "google_compute_backend_bucket" "default" {
+  name = "backend-bucket"
+  description = "contains beautiful images"
+  bucket_name = google_storage_bucket.default.name
+  enable_cdn = true
+  cdn_policy {
+    cache_mode = "CACHE_ALL_STATIC"
+    client_ttl = 3600
+    default_ttl = 3600
+    max_ttl = 86400
+    negative_caching = true
+    serve_while_stale = 86400
+  }
+}
 
-  protocol  = "HTTP"
+resource "google_compute_health_check" "default" {
+  name               = "http-basic-check"
+  check_interval_sec = 5
+  healthy_threshold  = 2
+  http_health_check {
+    port               = 80
+    port_specification = "USE_FIXED_PORT"
+    proxy_header       = "NONE"
+    request_path       = "/"
+  }
+  timeout_sec         = 5
+  unhealthy_threshold = 2
+}
+
+resource "google_compute_backend_service" "group" {
+  name      = "group"
   port_name = "http"
-  timeout_sec = 30
+  protocol  = "HTTP"
 
   backend {
-    group = google_compute_region_network_endpoint_group.serverless_neg.id
+    group = google_compute_instance_group.group.id
   }
+
+  health_checks = [
+    google_compute_health_check.default.id,
+  ]
 }
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
@@ -48,10 +84,10 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   }
 }
 
-# http proxy
-resource "google_compute_target_http_proxy" "http_proxy" {
-  name = "http-lb-proxy"
-  url_map = google_compute_url_map.http_lb.id
+resource "google_compute_target_https_proxy" "https_proxy" {
+  name             = "https-lb-proxy"
+  url_map          = google_compute_url_map.http_lb.id
+  ssl_certificates = [google_compute_managed_ssl_certificate.ssl.id]
 }
 
 # forwarding rule
@@ -59,8 +95,8 @@ resource "google_compute_global_forwarding_rule" "forwarding" {
   name = "http-lb-forwarding-rule"
   ip_protocol = "TCP"
   load_balancing_scheme = "EXTERNAL"
-  port_range = "80"
-  target = google_compute_target_http_proxy.http_proxy.id
+  port_range = "443"
+  target = google_compute_target_https_proxy.https_proxy.id
   ip_address = google_compute_global_address.cdn_ip.id
 }
 
@@ -242,4 +278,128 @@ resource "google_secret_manager_secret_version" "db_conn" {
 
 resource "google_service_account" "cloudrun_sa" {
   account_id = "cloudrun-sa"
+}
+
+resource "random_id" "bucket_prefix" {
+  byte_length = 8
+}
+
+resource "google_storage_bucket" "default" {
+  name = "${random_id.bucket_prefix.hex}-my-bucket"
+  location = var.region
+  uniform_bucket_level_access = true
+  storage_class = "STANDARD"
+  // delete bucket and contents on destroy.
+  force_destroy = true
+}
+
+# make bucket public
+resource "google_storage_bucket_iam_member" "default" {
+  bucket = google_storage_bucket.default.name
+  role = "roles/storage.legacyObjectReader"
+  member = "allUsers"
+}
+
+resource "google_compute_managed_ssl_certificate" "ssl" {
+  name = "web-ssl"
+
+  managed {
+    domains = ["share-engine.click."]
+  }
+}
+
+resource "google_compute_instance_template" "default" {
+  name = "lb-backend-template"
+  disk {
+    auto_delete  = true
+    boot         = true
+    device_name  = "persistent-disk-0"
+    mode         = "READ_WRITE"
+    source_image = "projects/debian-cloud/global/images/family/debian-12"
+    type         = "PERSISTENT"
+  }
+  machine_type = "n1-standard-1"
+  network_interface {
+    access_config {
+      network_tier = "PREMIUM"
+    }
+    network    = google_compute_network.default.id
+  }
+  region = var.region
+  scheduling {
+    automatic_restart   = true
+    on_host_maintenance = "MIGRATE"
+    provisioning_model  = "STANDARD"
+  }
+  service_account {
+    email  = "default"
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+  }
+  tags = ["allow-health-check", "bastion"]
+}
+
+resource "google_compute_instance_group_manager" "default" {
+  name = "lb-backend-example"
+  zone = "${var.region}-a"
+  named_port {
+    name = "http"
+    port = 80
+  }
+  version {
+    instance_template = google_compute_instance_template.default.id
+    name              = "primary"
+  }
+  base_instance_name = "vm"
+  target_size        = 1
+}
+
+resource "google_compute_firewall" "default" {
+  name          = "fw-allow-health-check"
+  direction     = "INGRESS"
+  network       = google_compute_network.default.id
+  priority      = 1000
+  source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
+  target_tags   = ["allow-health-check"]
+  allow {
+    ports    = ["80"]
+    protocol = "tcp"
+  }
+}
+
+resource "google_compute_instance_group" "group" {
+  name      = "instance-group"
+  zone = "us-central1-a"
+  # zone      = "us-central-a"
+  instances = [google_compute_instance.vm.id]
+  named_port {
+    name = "http"
+    port = "80"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_instance" "vm" {
+  name         = "vm-prod"
+  machine_type = "n1-standard-1"
+  zone         = "us-central1-a"
+  boot_disk {
+    initialize_params {
+      image = "projects/debian-cloud/global/images/debian-12-bookworm-v20240110"
+      size = 10
+			type = "pd-balanced"
+    }
+  }
+
+  network_interface {
+    network = google_compute_network.default.id
+    access_config {}
+  }
+  tags = ["bastion", "allow-health-check"]
+  service_account {
+        email  = "587271627789-compute@developer.gserviceaccount.com"
+        scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+   }
 }
