@@ -14,8 +14,12 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const overlayY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
     const overlayOpacity = React.useRef(new Animated.Value(0)).current;
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
-    const photos = [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
+    const photos = rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
 
+    useEffect(() => {
+        rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : false;
+    }, [rentalItem.status]);
+    
     useEffect(() => {
         Animated.parallel([
             Animated.timing(overlayY, {

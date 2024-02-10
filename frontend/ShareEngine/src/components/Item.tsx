@@ -8,11 +8,6 @@ const numColumns = 2;
 const totalPadding = 40; // total padding in a row
 const itemWidth = (screenWidth - totalPadding) / numColumns;
 
-export const ItemStatus = {
-    "Available": true,
-    "Rented": false,
-}
-
 
 export interface ItemProps {
     name: string;
@@ -31,6 +26,7 @@ export interface ItemDetailedProps {
     available: boolean;
     id: string;
     price: number;
+    photos?: string[];
     image_url1?: string | null;
     image_url2?: string | null;
     image_url3?: string | null;
@@ -39,6 +35,7 @@ export interface ItemDetailedProps {
     description: string;
     precaution?: string;
     days?: number;
+    status?: boolean;
 }
 
 export interface ItemCardProps {

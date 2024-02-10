@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
-import { ItemCard, ItemCardProps, ItemProps, ItemStatus } from "../components/Item";
+import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
 import { fetchItemDetails, fetchItems, fetchUser, otherFetch } from "../Utils";
 import { CustomButton } from "../components/SmallComponents";
@@ -50,18 +50,19 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     const handlePress = async (item : ItemProps) => {
         console.log('Pressed item with ID:', item.id);
         console.log('Item:', item);
-            if (item.id !== undefined) {
-                await fetchItemDetails(item.id).then((res) => {
-                    console.log('Fetched item details:', res);
-                    return res;
-                }).catch((error) => {
-                    console.error('Error fetching item details:', error);
-                }).then((itemDetails) => {
-                    navigation.navigate('Details', { itemObject: itemDetails });
-                    // console.log('Navigating to Details');
-                });
-            }
-            // navigation.navigate('Details', { itemObject: item });
+        
+        // if (item.id !== undefined) {
+        //     await fetchItemDetails(item.id).then((res) => {
+        //         console.log('Fetched item details:', res);
+        //         return res;
+        //     }).catch((error) => {
+        //         console.error('Error fetching item details:', error);
+        //     }).then((itemDetails) => {
+        //         navigation.navigate('Details', { itemObject: itemDetails });
+        //         // console.log('Navigating to Details');
+        //     });
+        // }
+            navigation.navigate('Details', { itemObject: item });
             // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
         };
 
