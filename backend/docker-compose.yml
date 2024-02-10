@@ -1,21 +1,26 @@
 version: "3.8"
 services:
-  web:
+  api:
     build: .
+    volumes:
+      - ./app:/app/app:cached
+      - ./scripts:/app/scripts:cached
     ports:
       - "8000:80"
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/dbname
+      - DATABASE_URL=postgresql+asyncpg://enginemaker:password@db:5432/shareengine
     depends_on:
       - db
   db:
-    image: postgres:13
+    image: postgres:16
+    volumes:
+      - ./app/db/local/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: enginemaker
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shareengine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
 volumes:
   postgres_data:
