@@ -9,3 +9,4 @@ class User(Base):
     name = Column(String)
     groups = relationship("UserGroup", back_populates="user")
     items = relationship("Item", back_populates="owner")
+    rent_logs = relationship("RentLog", back_populates="renter")

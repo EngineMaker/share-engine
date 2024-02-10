@@ -3,9 +3,12 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from models.item import Item as ItemModel
 from models.group_item import GroupItem as GroupItemModel
+from models.rent_log import RentLog
 from typing import List
 from services.user_service import get_groups
-from sqlalchemy import inspect
+from sqlalchemy import update
+from fastapi import HTTPException
+from datetime import datetime
 
 async def get_items_for_user_groups(db: AsyncSession, user_id: int):
     # ユーザーが所属するグループのIDを取得
@@ -76,3 +79,50 @@ async def get_item_detail(db: AsyncSession, item_id: int, user_id: int):
 #     item = result.scalars().first()
 #     group_ids = [ug.group.id for ug in item.groups]
 #     return group_ids
+
+
+async def rent_item(db: AsyncSession, item_id: int, renter_id: int) -> RentLog:
+    # Check if item is available
+    item = await db.execute(select(ItemModel).filter(ItemModel.id == item_id))
+    item = item.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    if not item.available:
+        raise Exception("Item is not available")
+    
+    # Update item availability
+    await db.execute(update(ItemModel).where(ItemModel.id == item_id).values(available=False))
+    
+    # Create rent log
+    rent_log = RentLog(item_id=item_id, renter_id=renter_id, returned=False, returned_at=None)
+    db.add(rent_log)
+    await db.commit()
+    await db.refresh(rent_log)
+    
+    return rent_log
+
+
+async def return_item(db: AsyncSession, item_id: int, renter_id: int) -> RentLog:
+    # Check if item is available
+    item = await db.execute(select(ItemModel).filter(ItemModel.id == item_id))
+    item = item.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    if item.available:
+        raise Exception("Item is already returned")
+    
+    # Update item availability
+    await db.execute(update(ItemModel).where(ItemModel.id == item_id).values(available=True))
+    
+    # Update rent log
+    rent_log = await db.execute(select(RentLog).filter(RentLog.item_id == item_id, RentLog.renter_id == renter_id, RentLog.returned == False))
+    rent_log = rent_log.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Rental Log not found")
+    await db.execute(update(RentLog).where(RentLog.item_id == item_id, RentLog.renter_id == renter_id, RentLog.returned == False).values(returned=True, returned_at=datetime.now()))
+    await db.commit()
+    await db.refresh(rent_log)
+    
+    return rent_log
