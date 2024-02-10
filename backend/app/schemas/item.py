@@ -3,7 +3,7 @@ from typing import Optional
 
 class ItemBase(BaseModel):
     name: str
-    status: str
+    available: bool
     price: int
     image_url1: Optional[str] = None
 
@@ -19,7 +19,7 @@ class ItemCreate(ItemBase):
 class ItemList(BaseModel):
     id: int
     name: str
-    status: str
+    available: bool
     price: int
     image_url1: Optional[str] = None
 

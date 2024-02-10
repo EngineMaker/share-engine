@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload
 from db.database import get_session
 from models.user import User as UserModel
 from models.user_group import UserGroup as UserGroupModel
-from schemas.user import UserWithGroups
+from schemas.user import UserDetail
 
 
 async def get_all(db: AsyncSession):
@@ -12,24 +12,36 @@ async def get_all(db: AsyncSession):
     return result.scalars().all()
 
 
-async def find_by_id(db: AsyncSession, user_id: int):
+async def get_detail(db: AsyncSession, user_id: int):
     result = await db.execute(
         select(UserModel)
         .where(UserModel.id == user_id)
-        .options(joinedload(UserModel.groups).joinedload(UserGroupModel.group))
+        .options(joinedload(UserModel.items))
     )
     user = result.scalars().first()
 
-    user_detail = UserWithGroups(
-        id=1,
-        name='test',
-        groups=[
+    user_detail = UserDetail(
+        name=user.name,
+        own_items=[
             {
-                "id": ug.group.id,
-                "name": ug.group.name,
-                "is_admin": ug.is_admin,
+                "id": item.id,
+                "name": item.name,
+                "available": item.available,
+                "price": item.price,
+                "image_url1": item.image_url1
             }
-            for ug in user.groups
+            for item in user.items
+        ],
+        rent_items=[
+            # TODO: 自分が借りているアイテム一覧の取得
+            {
+                "id": item.id,
+                "name": item.name,
+                "available": item.available,
+                "price": item.price,
+                "image_url1": item.image_url1
+            }
+            for item in user.items
         ]
     )
 

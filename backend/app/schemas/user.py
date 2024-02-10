@@ -1,15 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from schemas.group import GroupWithAdminInfo
-
-class UserBase(BaseModel):
-    name: str
-
-class UserCreate(UserBase):
-    pass
-
-class User(UserBase):
-    id: int
+from schemas.item import ItemList
 
 class UserList(BaseModel):
     id: int
@@ -18,10 +9,9 @@ class UserList(BaseModel):
     class Config:
         orm_mode = True
 
-class UserWithGroups(BaseModel):
-    id: int
+class UserDetail(BaseModel):
     name: str
-    groups: list[GroupWithAdminInfo]
-
+    own_items: list[ItemList]
+    rent_items: list[ItemList]
     class Config:
         orm_mode = True
