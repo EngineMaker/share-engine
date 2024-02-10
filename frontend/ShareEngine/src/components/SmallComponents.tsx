@@ -16,6 +16,7 @@ export const CustomButton = ({
             style={style || { 
                 backgroundColor: 'lightblue',
                 padding: 10, borderRadius: 5, marginTop: 20 }}
+            activeOpacity={0.7}
         >
             <Text
             style={textStyle || { fontSize: 20, color: "black" }}

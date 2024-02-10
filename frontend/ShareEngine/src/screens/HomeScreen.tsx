@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps, ItemStatus } from "../components/Item";
 import { dummyItems } from "../dummyItems";
@@ -7,19 +7,24 @@ import { dummyItems } from "../dummyItems";
 const HomeScreen = ({ navigation }: { navigation: any }) => {
     const [items, setItems] = React.useState<ItemProps[]>(dummyItems);
     const numColumns = 2;
+
+    useEffect(() => {
+        setItems(dummyItems);
+    }, [dummyItems]);
+
     const renderItem = ({ item }: { item: ItemProps }) => (
         <ItemCard
             name={item.name}
             status={item.status}
             price={item.price}
             id={item.id}
-            photo={item.photo}
+            photos={item.photos}
+            owner={item.owner}
             // onPress={(itemID: string) => handlePress(itemID)}
             onPress={() => handlePress(item)}
             onLongPress={() => handleLongPress(item)}
             onEdit={() => handleEdit(item.id ?? '')}
-            onDelete={() => handleDelete(item.id ?? '')}
-        />
+            onDelete={() => handleDelete(item.id ?? '')}         />
     );
     const handlePress = (item : ItemProps) => {
         console.log('Pressed item with ID:', item.id);

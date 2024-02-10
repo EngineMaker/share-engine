@@ -26,6 +26,9 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
     },
+    cardText: {
+        fontSize: 25,
+    },
     title: {
         fontSize: 18,
         fontWeight: "bold",
@@ -54,10 +57,9 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     image: {
-        width: "60%",
-        height: "60%",
+        width: "100%",
+        height: "80%",
         resizeMode: "cover",
-        borderRadius: 4,
     },
     price: {
         fontSize: 16,
