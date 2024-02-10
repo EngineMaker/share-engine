@@ -196,6 +196,13 @@ resource "google_cloud_run_v2_service" "backend_api" {
     type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100
   }
+  lifecycle {
+    ignore_changes = [
+      traffic,
+      template,
+      client
+    ]
+  }
   depends_on = [
     google_project_service.cloudrun,
     google_artifact_registry_repository.backend,
