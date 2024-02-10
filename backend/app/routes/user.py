@@ -28,3 +28,7 @@ async def create_user(user_create: UserCreateSchema, db: AsyncSession = Depends(
     await db.commit()
     await db.refresh(new_user)
     return {"name": new_user.name}
+
+@router.get("/me")
+async def get_my_id(current_user: TokenData = Depends(get_current_user)):
+    return {"user_id": current_user.user_id}
