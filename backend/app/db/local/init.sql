@@ -1,6 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE groups (
@@ -54,8 +55,10 @@ CREATE TABLE IF NOT EXISTS rent_logs (
     FOREIGN KEY (renter_id) REFERENCES users(id)
 );
 
+-- 全体のクリア
+TRUNCATE TABLE users, groups, user_groups, items, group_items, rent_logs;
 -- サンプルデータの挿入
-INSERT INTO users (name) VALUES ('Alice'), ('Bob');
+INSERT INTO users (name, hashed_password) VALUES ('Alice', 'Passw0rd'), ('Bob', 'P4ssword');
 INSERT INTO groups (name) VALUES ('Group1'), ('Group2');
 INSERT INTO user_groups (user_id, group_id, is_admin) VALUES (1, 1, TRUE), (2, 2, FALSE);
 

@@ -15,3 +15,7 @@ class UserDetail(BaseModel):
     rent_items: list[ItemList]
     class Config:
         orm_mode = True
+
+class UserCreate(BaseModel):
+    name: str
+    password: str

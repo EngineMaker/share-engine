@@ -5,6 +5,8 @@ ENV PYTHONUNBUFFERD True
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
+# pycryptoのコンパイルに必要そうだったので追加(pycrypto削除したので一旦コメントアウト)
+# RUN apt-get update && apt-get install -y build-essential
 RUN pip install poetry
 
 COPY pyproject.toml poetry.lock* /app/
