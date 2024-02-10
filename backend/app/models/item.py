@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from db.database import Base
 
@@ -12,7 +12,7 @@ class Item(Base):
     image_url4 = Column(String, nullable=True)
     image_url5 = Column(String, nullable=True)
     owner_id = Column(Integer, ForeignKey('users.id'))
-    status = Column(String, index=True)
+    available = Column(Boolean, index=True)
     price = Column(Integer, default=0)
     description = Column(String, nullable=True)
     precaution = Column(String, nullable=True)
