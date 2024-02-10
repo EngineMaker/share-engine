@@ -1,43 +1,50 @@
 import React from "react";
-import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList } from "react-native";
-import { Item, ItemProps, ItemStatus } from "../components/Item";
+import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
+import { ItemCard, ItemCardProps, ItemProps, ItemStatus } from "../components/Item";
 import { dummyItems } from "../dummyItems";
 
-export const handlePress = (itemID: string) => {
-    console.log("Item " + itemID + " Pressed");
-}
-
-export const handleLongPress = () => {
-    console.log("Long Pressed");
-}
-
-export const handleEdit = () => {
-    console.log("Edit");
-}
-
-export const handleDelete = () => {
-    console.log("Delete");
-}
 
 const HomeScreen = ({ navigation }: { navigation: any }) => {
+    const [items, setItems] = React.useState<ItemProps[]>(dummyItems);
     const numColumns = 2;
     const renderItem = ({ item }: { item: ItemProps }) => (
-        <Item
+        <ItemCard
             name={item.name}
             status={item.status}
             price={item.price}
             id={item.id}
-            onPress={() => item.onPress(item.id!)} // Ensure item.id is always a string
-            onLongPress={item.onLongPress}
-            onEdit={item.onEdit}
-            onDelete={item.onDelete}
+            photo={item.photo}
+            // onPress={(itemID: string) => handlePress(itemID)}
+            onPress={() => handlePress(item)}
+            onLongPress={() => handleLongPress(item)}
+            onEdit={() => handleEdit(item.id ?? '')}
+            onDelete={() => handleDelete(item.id ?? '')}
         />
     );
+    const handlePress = (item : ItemProps) => {
+        console.log('Pressed item with ID:', item.id);
+        console.log('Item:', item);
+        navigation.navigate('Details', { itemObject: item });
+        // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
+    };
+
+    const handleLongPress = (item : ItemProps) => {
+        console.log('Long pressed item with ID:', item);
+    };
+
+    const handleEdit = (itemID: string) => {
+        console.log('Editing item with ID:', itemID);
+    };
+
+    const handleDelete = (itemID: string) => {
+        console.log('Deleting item with ID:', itemID);
+    };
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <SafeAreaView 
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <FlatList
-                data={dummyItems}
+                data={items}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
                 numColumns={numColumns}
@@ -51,13 +58,13 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                 style={{ 
                     backgroundColor: 'red',
                     position: 'absolute',
-                    top: 0,
-                    left: 5,
+                    top: 30,
+                    left: 15,
                     padding: 5, borderRadius: 5,}}
             >
                 <Text>Login</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }
 

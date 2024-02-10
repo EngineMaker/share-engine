@@ -100,6 +100,12 @@ resource "google_project_service" "cloudbuild" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "secret" {
+  project            = var.project_id
+  service            = "secretmanager.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_compute_global_address" "private_ip_address" {
   project       = var.project_id
   name          = "private-ip"
@@ -139,9 +145,15 @@ resource "google_sql_database_instance" "instance" {
 }
 
 resource "google_sql_user" "user" {
-  name     = "db-user"
+  name     = var.db_user
   instance = google_sql_database_instance.instance.name
   password = var.db_password
+}
+
+resource "google_sql_database" "database" {
+  name     = var.db_name
+  instance = google_sql_database_instance.instance.name
+  deletion_policy = "ABANDON"
 }
 
 # backend api
@@ -169,12 +181,13 @@ resource "google_cloud_run_v2_service" "backend_api" {
         container_port = 80
       }
       env {
-        name = "FOO"
-        value = "bar"
-      }
-      volume_mounts {
-        name = "cloudsql"
-        mount_path = "/cloudsql"
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.db_conn.secret_id
+            version = "latest"
+          }
+        }
       }
     }
   }
@@ -185,7 +198,8 @@ resource "google_cloud_run_v2_service" "backend_api" {
   }
   depends_on = [
     google_project_service.cloudrun,
-    google_artifact_registry_repository.backend
+    google_artifact_registry_repository.backend,
+    google_secret_manager_secret_version.db_conn,
   ]
 }
 
@@ -196,10 +210,29 @@ resource "google_cloud_run_v2_service" "backend_api" {
    }
  }
 
- resource "google_cloud_run_service_iam_policy" "noauth" {
+resource "google_cloud_run_service_iam_policy" "noauth" {
    location    = google_cloud_run_v2_service.backend_api.location
    project     = google_cloud_run_v2_service.backend_api.project
    service     = google_cloud_run_v2_service.backend_api.name
 
    policy_data = data.google_iam_policy.noauth.policy_data
- }
+} 
+
+resource "google_secret_manager_secret" "db_conn" {
+  secret_id = "db-conn"
+  replication {
+    auto {}
+  }
+  depends_on = [
+    google_project_service.secret
+  ]
+}
+
+resource "google_secret_manager_secret_version" "db_conn" {
+  secret      = google_secret_manager_secret.db_conn.name
+  secret_data = var.db_conn
+}
+
+resource "google_service_account" "cloudrun_sa" {
+  account_id = "cloudrun-sa"
+}

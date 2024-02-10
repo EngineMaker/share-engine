@@ -10,18 +10,28 @@ const itemWidth = (screenWidth - totalPadding) / numColumns;
 
 export type ItemStatus = "Available" | "Sold" | "Rented";
 
+
 export interface ItemProps {
     name: string;
     status: ItemStatus;
     id?: string;
     price?: number;
     photo?: string;
-    onPress: (id: string) => void;
+}
+
+export interface ItemCardProps {
+    name: string;
+    status: ItemStatus;
+    id?: string;
+    price?: number;
+    photo?: string;
+    onPress: (item: ItemProps) => void;
     onLongPress: () => void;
     onEdit: () => void;
     onDelete: () => void;
 }
-export const Item = ({
+
+export const ItemCard = ({
     name,
     status,
     price,
@@ -31,10 +41,10 @@ export const Item = ({
     onLongPress,
     onEdit,
     onDelete,
-}: ItemProps) => {
+}: ItemCardProps) => {
     return (
         <TouchableOpacity
-            onPress={(event: GestureResponderEvent) => onPress(id ?? '')}
+            onPress={() => onPress({ name, status, price, id, photo } as ItemProps)}
             onLongPress={onLongPress}
             style={{ 
                 width: itemWidth,
@@ -51,7 +61,7 @@ export const Item = ({
                 style={styles.image}
                 source={photo ? { uri: photo } : require(placeholder)}
             />
-            {price && <Text style={styles.subtitle}>${price}</Text>}
+            {price && <Text style={styles.subtitle}>{price} ¥</Text>}
             <View style={{ flexDirection : "row", justifyContent: "space-between" }}>
                 <Button title="Edit" onPress={onEdit} />
                 <Button title="Delete" onPress={onDelete} />
