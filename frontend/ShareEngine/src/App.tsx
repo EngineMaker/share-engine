@@ -34,7 +34,7 @@ const HomeStackScreen = () => (
 function App() {
   return (
     <NavigationContainer>
-      <MainStack.Navigator initialRouteName="Login">
+      <MainStack.Navigator initialRouteName="HomeStack">
         <MainStack.Screen
           name="LoginStack"
           component={LoginStackScreen}

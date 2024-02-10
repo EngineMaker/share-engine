@@ -27,8 +27,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     title: {
-        fontSize: 24,
-        marginBottom: 16,
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 8,
     },
     subtitle: {
         fontSize: 18,
@@ -37,6 +38,36 @@ const styles = StyleSheet.create({
     paragraph: {
         fontSize: 16,
         marginBottom: 8,
+    },
+    cardContainer: {
+        width: "30%",
+        height: 150,
+        backgroundColor: "white",
+        borderRadius: 8,
+        padding: 5,
+        margin: 8,
+        marginBottom: 16,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    image: {
+        width: "60%",
+        height: "60%",
+        resizeMode: "cover",
+        borderRadius: 4,
+    },
+    price: {
+        fontSize: 16,
+        color: "green",
+    },
+    description: {
+        fontSize: 14,
     },
 });
 
