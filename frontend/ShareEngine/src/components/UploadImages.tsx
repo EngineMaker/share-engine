@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,10 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActionSheetIOS,
 } from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import {ImagePickerResponse} from 'react-native-image-picker';
 
 const cameraIcon = require('../images/cameraIcon.png');
 
@@ -26,6 +28,8 @@ export const UploadImages = ({
   images: string[] | null;
   setImages: React.Dispatch<React.SetStateAction<string[] | null>>;
 }) => {
+  const options = ['写真を撮る', 'フォトライブラリから選択', 'キャンセル'];
+
   let emptyIndex = 4;
 
   for (let i = 0; i < 3; i++) {
@@ -43,11 +47,40 @@ export const UploadImages = ({
     if (index > emptyIndex) {
       return;
     }
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 1,
-      selectionLimit: 3,
+
+    let result: ImagePickerResponse | undefined;
+
+    const buttonIndex = await new Promise<number>(resolve => {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex: 2,
+          cancelButtonTintColor: 'red',
+        },
+        (buttonIndex: number) => {
+          resolve(buttonIndex);
+        },
+      );
     });
+
+    if (buttonIndex === 0) {
+      result = await launchCamera({
+        mediaType: 'photo',
+        saveToPhotos: true,
+        quality: 1,
+        cameraType: 'front',
+      });
+    } else if (buttonIndex === 1) {
+      result = await launchImageLibrary({
+        mediaType: 'photo',
+        quality: 1,
+        selectionLimit: 3,
+      });
+    }
+
+    if (result === undefined) {
+      return;
+    }
 
     if (result.assets) {
       const newUris = result.assets.map(asset => asset.uri);
