@@ -42,6 +42,7 @@ class ItemDetail(ItemList):
     image_url4: Optional[str] = None
     image_url5: Optional[str] = None
     precaution: Optional[str] = None
+    renter_id: Optional[int] = None
 
     class Config:
         orm_mode = True

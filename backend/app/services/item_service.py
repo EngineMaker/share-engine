@@ -67,6 +67,19 @@ async def get_item_detail(db: AsyncSession, item_id: int, user_id: int):
     if item.groups[0].group_id not in usr_group_ids:
         return None
 
+    # renterを探す
+    if not item.available:
+        rent_log_result = await db.execute(
+            select(RentLog)
+            .where(RentLog.item_id == item_id, RentLog.returned == False)
+        )
+        rent_log = rent_log_result.scalars().first()
+
+        if not rent_log:
+            raise Exception("Item has rent by Unknown")
+        renter_id = rent_log.renter_id
+    item.renter_id = renter_id
+
     return item
 
 
