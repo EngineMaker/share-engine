@@ -29,15 +29,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: "bold",
-        marginBottom: 8,
     },
     subtitle: {
         fontSize: 18,
-        marginBottom: 8,
     },
     paragraph: {
         fontSize: 16,
-        marginBottom: 8,
     },
     cardContainer: {
         width: "30%",

@@ -33,7 +33,7 @@ const HomeStackScreen = () => (
     <HomeStack.Screen
       name="Details"
       component={DetailsScreen}
-      options={{ title: 'Details Screen' }}
+      options={{ headerShown: false }}
     />
   </HomeStack.Navigator>
 );
@@ -43,17 +43,17 @@ const HomeTabScreen = () => (
     <Tab.Screen
       name="HomeStack"
       component={HomeStackScreen}
-      options={{ title: 'Home' }}
+      options={{ headerShown: false }}
     />
     <Tab.Screen
       name="Publish"
       component={PublishScreen}
-      options={{ title: 'Publish' }}
+      options={{ headerShown: false }}
     />
     <Tab.Screen
       name="Profile"
       component={ProfileScreen}
-      options={{ title: 'Profile' }}
+      options={{ headerShown: false }}
     />
   </Tab.Navigator>
 );
