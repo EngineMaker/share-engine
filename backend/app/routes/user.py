@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from db.database import get_session
 from models.user import User as UserModel
+from models.user_group import UserGroup as UserGroupModel
 from schemas.user import UserDetail as UserDetailSchema
 from schemas.user import UserList as UserListSchema
 from schemas.user import UserCreate as UserCreateSchema
@@ -25,6 +26,9 @@ async def create_user(user_create: UserCreateSchema, db: AsyncSession = Depends(
     hashed_password = hash_password(user_create.password)
     new_user = UserModel(name=user_create.name, hashed_password=hashed_password)
     db.add(new_user)
+    await db.flush()
+    new_user_group = UserGroupModel(user_id=new_user.id, group_id=1)
+    db.add(new_user_group)
     await db.commit()
     await db.refresh(new_user)
     return {"name": new_user.name}
