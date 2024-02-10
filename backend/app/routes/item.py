@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from db.database import get_session
-from services.item_service import get_items_for_user_groups, get_item_detail, rent_item, return_item
-from schemas.item import ItemList, ItemDetail
+from services.item_service import get_items_for_user_groups, get_item_detail, rent_item, return_item, create_item
+from schemas.item import ItemList, ItemDetail, ItemResponse, ItemCreate
 from schemas.rent_log import RentLogResponse, RentLogCreate
 from models.rent_log import RentLog
 
@@ -46,3 +46,15 @@ async def return_an_item(rent_log: RentLogCreate, db: AsyncSession = Depends(get
         return rented_item_log
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/items/", response_model=ItemResponse)
+async def create_new_item(item: ItemCreate, db: AsyncSession = Depends(get_session)):
+    try:
+        # TODO: login_user_idの取得
+        user_id = 1
+        # TODO:画像データの取得 
+        # image_data =
+        new_item = await create_item(db=db, user_id=1, item_data=item.dict(), images=[])
+        return new_item
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
