@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
-import { fetchItemDetails, fetchItems, fetchUser, otherFetch } from "../Utils";
+import { fetchItemDetailsRequest, fetchItemsRequest, fetchUser, otherFetch } from "../Utils";
 import { CustomButton } from "../components/SmallComponents";
 
 
@@ -106,7 +106,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             <CustomButton
                 title={'debug fetch items'}
                 onPress={async () => {
-                    await fetchItems()
+                    await fetchItemsRequest()
                     .catch((error) => {
                         console.error('Error fetching items:', error);
                     })

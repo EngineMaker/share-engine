@@ -65,7 +65,7 @@ const itemsUrl = 'http://localhost:8000/api/v1/items/'
 // const itemsUrl = 'http://34.71.228.117/api/v1/items/'
 const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
 
-export const fetchItemDetails = async (itemID: string) => {
+export const fetchItemDetailsRequest = async (itemID: string) => {
     try {
         console.log('Fetching item details');
         const response = await fetch(itemsUrl + itemID); // for example, http://localhost:8000/api/v1/items/1
@@ -77,7 +77,7 @@ export const fetchItemDetails = async (itemID: string) => {
     }
 }
 
-export const fetchItems = async () => {
+export const fetchItemsRequest = async () => {
     try {
         console.log('Fetching items');
         const response = await fetch(itemsUrl);
@@ -89,7 +89,27 @@ export const fetchItems = async () => {
     }
 }
 
-export const postNewItem = async (item: any) => {
+export const rentItemRequest = async (itemID: string) => {
+    const body = {
+        "item_id": itemID,
+    };
+    const method = 'POST';
+    const response = await fetcher(itemsUrl + 'rent', method, body);
+    console.log('Response:', response);
+    return response;
+}
+
+export const returnItemRequest = async (itemID: string) => {
+    const body = {
+        "item_id": itemID,
+    };
+    const method = 'POST';
+    const response = await fetcher(itemsUrl + 'return', method, body);
+    console.log('Response:', response);
+    return response;
+}
+
+export const postNewItemRequest = async (item: any) => {
     const body = item;
     console.log('Posting new item:', body);
     const method = 'POST';
@@ -108,5 +128,5 @@ export const fetcher = async (url: string, method: string, body?: any) => {
         body: JSON.stringify(body),
     });
     console.log('Status code:', response.status);
-    return response.json();
+    return response;
 }

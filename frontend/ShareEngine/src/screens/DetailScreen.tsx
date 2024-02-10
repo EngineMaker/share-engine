@@ -5,6 +5,7 @@ import { CustomButton } from "../components/SmallComponents";
 import styles from "../Styles";
 import Carousel from "react-native-reanimated-carousel";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
+import { rentItemRequest, returnItemRequest } from "../Utils";
 
 export function DetailsScreen({ route, navigation }: { route: any, navigation: any }) {
     const { itemObject } = route.params;
@@ -16,9 +17,10 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
     const photos = rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
 
+    // TODO: REMOVE THIS LATER
     useEffect(() => {
         rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : false;
-    }, [rentalItem.status]);
+    }, []);
     
     useEffect(() => {
         Animated.parallel([
@@ -41,13 +43,46 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         }
     }, [photos]);
 
-    console.log('ItemPropsObject:', itemObject);
     useEffect(() => {
         if (itemObject && !rentalItem.id) {
             setRentalItem(itemObject);
             console.log('Item set:', rentalItem);
         }
     }, [itemObject]);
+
+    const rentItem = async () => {
+        console.log('Renting:', rentalItem);
+        await rentItemRequest(rentalItem.id)
+        .then((res) => {
+            if (res.status === 200) {
+                console.log('Rented!:', rentalItem.name);
+            }
+            else if (res.status === 400) {
+                console.log('Item already rented:', rentalItem.name);
+                setRentalItem({ ...rentalItem, available: false });
+            }
+        })
+        .catch((error) => {
+            console.error('Error renting:', error);
+        });
+    }
+
+    const returnItem = async () => {
+        console.log('Renting:', rentalItem);
+        await returnItemRequest(rentalItem.id)
+        .then((res) => {
+            if (res.status === 200) {
+                console.log('Returned!:', rentalItem.name);
+            }
+            else if (res.status === 400) {
+                console.log('Item already returned:', rentalItem.name);
+                setRentalItem({ ...rentalItem, available: true });
+            }
+        })
+        .catch((error) => {
+            console.error('Error renting:', error);
+        });
+    }
 
     return (
         <SafeAreaView style={{ flex: 1, 
@@ -190,9 +225,10 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 padding: 20,
                                 paddingHorizontal: 30,
                             }}>
-                                <Text style={[styles.cardText, {marginVertical: 3, fontWeight: 'bold', alignSelf: 'center'}]}
-                                    >{rentalItem.name}
+                                <Text style={[styles.cardText, {marginVertical: 3, fontWeight: 'bold', alignSelf: 'center'}]}>
+                                    {rentalItem.name}
                                 </Text>
+                                <View style={{ borderBottomColor: '#CDCDCD', borderBottomWidth: 2, alignSelf: 'stretch', marginVertical: 5 }} />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30,}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>借りる相手</Text>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.owner}</Text>
@@ -224,7 +260,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>返却日</Text>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.days ? new Date(Date.now() + rentalItem.days * 24 * 60 * 60 * 1000).toLocaleDateString() : '未設定'}</Text>
                                 </View>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30, alignContent: 'center', alignItems: 'center',}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 20, paddingHorizontal: 30, alignContent: 'center', alignItems: 'center',}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>合計</Text>
                                     {rentalItem.price ? rentalItem.price > 0 &&
                                     <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
@@ -236,6 +272,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>無料</Text>
                                     }
                                 </View>
+                                <View style={{ borderBottomColor: '#CDCDCD', borderBottomWidth: 2, alignSelf: 'stretch', marginVertical: 5 }} />
                                 <CustomButton
                                     title="借りる"
                                     style={[
@@ -260,6 +297,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                     }}
                                     onPress={() => {
                                         console.log('Renting:', rentalItem);
+                                        rentItem();
                                         setIsRentOverlayVisible(false);
                                     }}
                                 />

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {NumberInput, CustomButton} from '../components/SmallComponents';
-import { postNewItem } from '../Utils';
+import { postNewItemRequest } from '../Utils';
 
 const PublishScreen = ({navigation}: {navigation: any}) => {
   const [itemName, setItemName] = useState('');
@@ -49,7 +49,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         "precaution": caution,
     }
     console.log("item:", body);
-    const response = await postNewItem(body).then((res) => {
+    const response = await postNewItemRequest(body).then((res) => {
         console.log('Posted new item:', res);
         navigation.navigate( 'Home' );
     })
