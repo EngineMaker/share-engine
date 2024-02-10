@@ -8,3 +8,4 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     groups = relationship("UserGroup", back_populates="user")
+    items = relationship("Item", back_populates="owner")

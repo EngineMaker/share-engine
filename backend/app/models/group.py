@@ -8,3 +8,4 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     users = relationship("UserGroup", back_populates="group")
+    items = relationship("GroupItem", back_populates="group")
