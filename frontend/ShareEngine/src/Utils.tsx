@@ -42,13 +42,61 @@ export const existsSecureItem = async (key: string) => {
     }
 }
 
+export const otherFetch = async () => {
+    const url = 'http://34.71.228.117/api/v1/users/1';
+    const method = 'GET';
+    const response = await fetcher(url, method);
+    console.log('Fetched user with fetcher:', response);
+}
+
+export const fetchUser = async () => {
+    try {
+        console.log('Fetching user');
+        const response = await fetch('http://34.71.228.117/api/v1/users/1');
+        console.log('Status code:', response.status);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+    }
+}
+
+const itemsUrl = 'http://localhost:8000/api/v1/items/'
+// const itemsUrl = 'http://34.71.228.117/api/v1/items/'
+const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
+
+export const fetchItemDetails = async (itemID: string) => {
+    try {
+        console.log('Fetching item details');
+        const response = await fetch(itemsUrl + itemID); // for example, http://localhost:8000/api/v1/items/1
+        console.log('Status code:', response.status);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching items:', error);
+    }
+}
+
+export const fetchItems = async () => {
+    try {
+        console.log('Fetching items');
+        const response = await fetch(itemsUrl);
+        console.log('Status code:', response.status);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching items:', error);
+    }
+}
+
 export const fetcher = async (url: string, method: string, body?: any) => {
-  const response = await fetch(url, {
-    method: method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  return response.json();
+    const response = await fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+    });
+    console.log('Status code:', response.status);
+    return response.json();
 }

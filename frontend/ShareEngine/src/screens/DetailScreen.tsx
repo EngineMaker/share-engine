@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, SafeAreaView, Image, Dimensions, Animated, Modal, TouchableWithoutFeedback } from "react-native";
-import { ItemProps } from "../components/Item";
+import { ItemDetailedProps, ItemProps } from "../components/Item";
 import { CustomButton } from "../components/SmallComponents";
 import styles from "../Styles";
 import Carousel from "react-native-reanimated-carousel";
@@ -8,12 +8,13 @@ import { ScrollView, TextInput } from "react-native-gesture-handler";
 
 export function DetailsScreen({ route, navigation }: { route: any, navigation: any }) {
     const { itemObject } = route.params;
-    const [rentalItem, setRentalItem] = React.useState<ItemProps>(itemObject ? itemObject : {});
+    const [rentalItem, setRentalItem] = React.useState<ItemDetailedProps>(itemObject ? itemObject : {});
     const screenWidth = Dimensions.get('window').width;
     const [isRentOverlayVisible, setIsRentOverlayVisible] = React.useState(false);
     const overlayY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
     const overlayOpacity = React.useRef(new Animated.Value(0)).current;
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
+    const photos = [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
 
     useEffect(() => {
         Animated.parallel([
@@ -29,6 +30,12 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
             }),
         ]).start();
     }, [isRentOverlayVisible]);
+
+    useEffect(() => {
+        if (photos) {
+            console.log('photos set:', photos);
+        }
+    }, [photos]);
 
     console.log('ItemPropsObject:', itemObject);
     useEffect(() => {
@@ -48,11 +55,11 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     width={screenWidth}
                     height={screenWidth * 0.75}
                     // autoPlay={true}
-                    data={rentalItem.photos ? rentalItem.photos : ['https://via.placeholder.com/150']}
+                    data={photos ? photos : ['https://via.placeholder.com/150']}
                     scrollAnimationDuration={1000}
                     renderItem={({ item }) => (
                         <Image
-                            source={{ uri: item }}
+                            source={{ uri: item! }}
                             style={{ width: "100%", height: "100%", resizeMode: 'cover' }}
                         />
                     )}
@@ -113,11 +120,11 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                         </View>
                     </View>
                     <CustomButton
-                        title={rentalItem.status ? '借りる詳細を決定する' : '現在貸出中です'}
+                        title={rentalItem.available ? '借りる詳細を決定する' : '現在貸出中です'}
                         style={[
                             styles.button,
                             {
-                                backgroundColor: rentalItem.status ? '#70B2FF' : '#909090',
+                                backgroundColor: rentalItem.available ? '#70B2FF' : '#909090',
                                 padding: 10,
                                 borderRadius: 15,
                                 marginTop: 20,
@@ -135,7 +142,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                             shadowOpacity: 0.5,
                         }}
                         onPress={() => {
-                            if (rentalItem.status) {
+                            if (rentalItem.available) {
                                 setIsRentOverlayVisible(!isRentOverlayVisible);
                             }
                         }}

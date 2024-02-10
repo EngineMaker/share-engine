@@ -26,6 +26,21 @@ export interface ItemProps {
     days?: number;
 }
 
+export interface ItemDetailedProps {
+    name: string;
+    available: boolean;
+    id: string;
+    price: number;
+    image_url1?: string | null;
+    image_url2?: string | null;
+    image_url3?: string | null;
+    image_url4?: string | null;
+    owner: string;
+    description: string;
+    precaution?: string;
+    days?: number;
+}
+
 export interface ItemCardProps {
     name: string;
     status: boolean;

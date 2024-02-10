@@ -2,15 +2,36 @@ import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps, ItemStatus } from "../components/Item";
 import { dummyItems } from "../dummyItems";
+import { fetchItemDetails, fetchItems, fetchUser, otherFetch } from "../Utils";
+import { CustomButton } from "../components/SmallComponents";
 
 
 const HomeScreen = ({ navigation }: { navigation: any }) => {
     const [items, setItems] = React.useState<ItemProps[]>(dummyItems);
+    const [newItems, setNewItems] = React.useState<ItemProps[]>([]);
     const numColumns = 2;
 
     useEffect(() => {
-        setItems(dummyItems);
-    }, [dummyItems]);
+        console.log('items:', items);
+    }, [items]);
+
+    useEffect(() => {
+        if (newItems.length > 0) {
+            console.log('New items:', newItems);
+            // setItems([...items, ...newItems]);
+            setItems([
+                ...newItems.map((item: any) => ({
+                    name: item.name,
+                    status: item.available,
+                    price: item.price,
+                    id: item.id,
+                    photos: [item.image_url1, item.image_url2, item.image_url3, item.image_url4].filter(Boolean),
+                    owner: item.owner ? item.owner : 'unknown',
+                    description: item.description,
+                }))
+            ]);
+        }
+    }, [newItems]);
 
     const renderItem = ({ item }: { item: ItemProps }) => (
         <ItemCard
@@ -26,12 +47,23 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             onEdit={() => handleEdit(item.id ?? '')}
             onDelete={() => handleDelete(item.id ?? '')}         />
     );
-    const handlePress = (item : ItemProps) => {
+    const handlePress = async (item : ItemProps) => {
         console.log('Pressed item with ID:', item.id);
         console.log('Item:', item);
-        navigation.navigate('Details', { itemObject: item });
-        // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
-    };
+            if (item.id !== undefined) {
+                await fetchItemDetails(item.id).then((res) => {
+                    console.log('Fetched item details:', res);
+                    return res;
+                }).catch((error) => {
+                    console.error('Error fetching item details:', error);
+                }).then((itemDetails) => {
+                    navigation.navigate('Details', { itemObject: itemDetails });
+                    // console.log('Navigating to Details');
+                });
+            }
+            // navigation.navigate('Details', { itemObject: item });
+            // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
+        };
 
     const handleLongPress = (item : ItemProps) => {
         console.log('Long pressed item with ID:', item);
@@ -69,6 +101,42 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             >
                 <Text>Login</Text>
             </TouchableOpacity>
+            <View style={{ position: 'absolute', top: 30, right: 15 }}>
+            <CustomButton
+                title={'debug fetch items'}
+                onPress={async () => {
+                    await fetchItems().then((res) => {
+                        console.log('Fetched items:', res);
+                        setNewItems(res);
+                        // setItems([...items,
+                        //     ...res.map((item: ItemProps) => ({
+                        //         // name: item.name,
+                        //         // status: res.available,
+                        //         // price: item.price,
+                        //         // id: res.id,
+                        //         // photos: [res.image_url1, res.image_url2, res.image_url3, res.image_url4].filter(Boolean),
+                        //         // owner: res.owner ? res.owner : 'unknown',
+                        //         // description: res.description,
+                        //         name: item.name,
+                        //         status: res.available,
+                        //         price: item.price,
+                        //         id: res.id,
+                        //         photos: [res.image_url1, res.image_url2, res.image_url3, res.image_url4].filter(Boolean),
+                        //         owner: res.owner ? res.owner : 'unknown',
+                        //         description: res.description,
+                        //     }))
+                        // ]);
+                    });
+                }}
+            />
+            <CustomButton
+                title={'set dummy items'}
+                onPress={() => {
+                    setItems(dummyItems);
+                }
+            }
+            />
+            </View>
         </SafeAreaView>
     );
 }
