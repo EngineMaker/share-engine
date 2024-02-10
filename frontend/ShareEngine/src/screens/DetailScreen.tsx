@@ -16,10 +16,11 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const overlayOpacity = React.useRef(new Animated.Value(0)).current;
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
     const photos = rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
+    const days = rentalItem.days ? rentalItem.days : 1;
 
     // TODO: REMOVE THIS LATER
     useEffect(() => {
-        rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : false;
+        rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : rentalItem.available;
     }, []);
     
     useEffect(() => {
@@ -56,6 +57,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         .then((res) => {
             if (res.status === 200) {
                 console.log('Rented!:', rentalItem.name);
+                setRentalItem({ ...rentalItem, available: false });
             }
             else if (res.status === 400) {
                 console.log('Item already rented:', rentalItem.name);
@@ -138,7 +140,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={[styles.cardText,{ marginVertical: 1 }]}>{ rentalItem.price !== undefined ? rentalItem.price > 0 ? '¥' + rentalItem.price + "/日" : 'Free' : 'Price not set' }</Text>
-                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem.owner}</Text>
+                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem.owner_id}</Text>
                     </View>
                     <Text
                         style={[styles.paragraph, { marginVertical: 5 }]}
@@ -181,8 +183,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                             shadowOpacity: 0.5,
                         }}
                         onPress={() => {
+                            console.log('Pressing rent button:', rentalItem);
                             if (rentalItem.available) {
-                                setIsRentOverlayVisible(!isRentOverlayVisible);
+                                setIsRentOverlayVisible(true);
                             }
                         }}
                     />
@@ -231,7 +234,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 <View style={{ borderBottomColor: '#CDCDCD', borderBottomWidth: 2, alignSelf: 'stretch', marginVertical: 5 }} />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30,}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>借りる相手</Text>
-                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.owner}</Text>
+                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.owner_id}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30, alignItems: 'center',}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>借りる日数</Text>
@@ -243,7 +246,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                         vertical={true}
                                         style={{ backgroundColor: 'white', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'black' }}
                                         data={daysArray}
-                                        defaultIndex={rentalItem.days ? rentalItem.days - 1 : 0}
+                                        defaultIndex={days ? days - 1 : 0}
                                         onSnapToItem={(index) => setRentalItem({ ...rentalItem, days: index + 1 })}
                                         scrollAnimationDuration={200}
                                         renderItem={({ item }) => (
@@ -258,14 +261,14 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30,}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>返却日</Text>
-                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.days ? new Date(Date.now() + rentalItem.days * 24 * 60 * 60 * 1000).toLocaleDateString() : '未設定'}</Text>
+                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{days ? new Date(Date.now() + days * 24 * 60 * 60 * 1000).toLocaleDateString() : '未設定'}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 20, paddingHorizontal: 30, alignContent: 'center', alignItems: 'center',}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>合計</Text>
                                     {rentalItem.price ? rentalItem.price > 0 &&
                                     <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
                                         <Text style={[styles.cardText,{ marginVertical: 1, fontWeight: 'bold', fontSize: 33
-                                         }]}>¥{rentalItem.days ? rentalItem.days * (rentalItem.price ?? 0) : 0}</Text>
+                                         }]}>¥{days ? days * (rentalItem.price ?? 0) : 0}</Text>
                                         <Text style={[styles.cardText,{ marginVertical: 1 }]}>¥{rentalItem.price ?? 0}/日</Text>
                                     </View>
                                     :

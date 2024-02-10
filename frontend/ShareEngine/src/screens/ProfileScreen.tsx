@@ -9,18 +9,27 @@ import {
 } from 'react-native';
 import {HorizontalList} from '../components/HorizontalScrollList';
 import {dummyItems} from '../dummyItems';
+import { ItemProps } from '../components/Item';
 
 const ellipseImage = require('../images/ellipse.png');
 
+interface User {
+  name: string;
+  borrowing: ItemProps[];
+  lending: ItemProps[];
+  history: ItemProps[];
+}
+
 const ProfileScreen = ({}) => {
   const tmpDummyItems = dummyItems;
-  const user = {
-    name: 'あんどれー',
-    bollowing: tmpDummyItems.slice(0, 5),
+  const dummyUser = {
+    name: 'ヤマザキ',
+    borrowing: tmpDummyItems.slice(0, 5),
     lending: tmpDummyItems.slice(3, 7),
-    history: undefined,
+    history: [] as ItemProps[],
   };
-
+  const [user, setUser] = React.useState<User>(dummyUser);
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.backgroundImageContainer}>
@@ -40,7 +49,7 @@ const ProfileScreen = ({}) => {
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={{marginBottom: 4, color: 'white'}}>
-              貸しているアイテム数: {user.bollowing.length}
+              貸しているアイテム数: {user.borrowing.length}
             </Text>
             <Text style={{color: 'white'}}>
               借りているアイテム数: {user.lending.length}
@@ -53,7 +62,7 @@ const ProfileScreen = ({}) => {
         </View>
 
         <Text style={styles.sectionTitle}>借りているアイテム</Text>
-        <HorizontalList itemList={user.bollowing} />
+        <HorizontalList itemList={user.borrowing} />
 
         <Text style={styles.sectionTitle}>貸しているアイテム</Text>
         <HorizontalList itemList={user.lending} />

@@ -31,7 +31,7 @@ export interface ItemDetailedProps {
     image_url2?: string | null;
     image_url3?: string | null;
     image_url4?: string | null;
-    owner: string;
+    owner_id: string;
     description: string;
     precaution?: string;
     days?: number;

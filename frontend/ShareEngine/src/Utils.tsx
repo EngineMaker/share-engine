@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import RNSecureStorage, {ACCESSIBLE} from 'rn-secure-storage';
 
+export const getUserID = async () => {
+    const userID = await getSecureItem('user_id');
+    return userID;
+}
+
 export const setSecureItem = async (key: string, value: string) => {
     console.log('Setting secure item: ' + key + ' ' + value);
     return await RNSecureStorage.setItem(key, value, {accessible: ACCESSIBLE.WHEN_UNLOCKED})
@@ -21,14 +26,14 @@ export const getSecureItem = async (key: string) => {
     return result;
 }
 
-// export const removeSecureItem = async (key: string) => {
-//     return await RNSecureStorage.removeItem(key)
-//         .catch((error: any) => {
-//             console.log(error);
-//             return error;
-//         }
-//     );
-// }
+export const removeSecureItem = async (key: string) => {
+    return await RNSecureStorage.removeItem(key)
+        .catch((error: any) => {
+            console.log(error);
+            return error;
+        }
+    );
+}
 
 export const existsSecureItem = async (key: string) => {
     console.log('existsSecureItem called with key:', key);
@@ -114,6 +119,17 @@ export const postNewItemRequest = async (item: any) => {
     console.log('Posting new item:', body);
     const method = 'POST';
     const response = await fetcher(itemsUrl, method, body);
+    console.log('Response:', response);
+    return response;
+}
+
+export const loginRequest = async (username: string, password: string) => {
+    const body = {
+        "username": username,
+        "password": password,
+    };
+    const method = 'POST';
+    const response = await fetcher('http://localhost:8000/api/v1/login', method, body);
     console.log('Response:', response);
     return response;
 }

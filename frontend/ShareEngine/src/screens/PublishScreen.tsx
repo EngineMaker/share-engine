@@ -47,6 +47,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         "price": loanAmount,
         "description": description,
         "precaution": caution,
+        "group_ids": ["1",]
     }
     console.log("item:", body);
     const response = await postNewItemRequest(body).then((res) => {

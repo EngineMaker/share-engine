@@ -26,7 +26,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     price: item.price,
                     id: item.id,
                     photos: [item.image_url1, item.image_url2, item.image_url3, item.image_url4].filter(Boolean),
-                    owner: item.owner ? item.owner : 'unknown',
+                    owner: item.owner_id ? item.owner_id : 'unknown',
+                    renter: item.renter_id ? item.renter_id : '',
                     description: item.description,
                 }))
             ]);
@@ -51,18 +52,18 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         console.log('Pressed item with ID:', item.id);
         console.log('Item:', item);
         
-        // if (item.id !== undefined) {
-        //     await fetchItemDetails(item.id).then((res) => {
-        //         console.log('Fetched item details:', res);
-        //         return res;
-        //     }).catch((error) => {
-        //         console.error('Error fetching item details:', error);
-        //     }).then((itemDetails) => {
-        //         navigation.navigate('Details', { itemObject: itemDetails });
-        //         // console.log('Navigating to Details');
-        //     });
-        // }
-            navigation.navigate('Details', { itemObject: item });
+        if (item.id !== undefined) {
+            await fetchItemDetailsRequest(item.id).then((res) => {
+                console.log('Fetched item details:', res);
+                return res;
+            }).catch((error) => {
+                console.error('Error fetching item details:', error);
+            }).then((itemDetails) => {
+                navigation.navigate('Details', { itemObject: itemDetails });
+                // console.log('Navigating to Details');
+            });
+        }
+            // navigation.navigate('Details', { itemObject: item });
             // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
         };
 
@@ -96,7 +97,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                 style={{ 
                     backgroundColor: 'red',
                     position: 'absolute',
-                    top: 30,
+                    top: 40,
                     left: 15,
                     padding: 5, borderRadius: 5,}}
             >
