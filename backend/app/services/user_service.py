@@ -30,7 +30,8 @@ async def get_detail(db: AsyncSession, user_id: int):
                 "name": item.name,
                 "available": item.available,
                 "price": item.price,
-                "image_url1": item.image_url1
+                "image_url1": item.image_url1,
+                "owner_id": user.id
             }
             for item in user.items
         ],
@@ -41,7 +42,8 @@ async def get_detail(db: AsyncSession, user_id: int):
                 "name": item.name,
                 "available": item.available,
                 "price": item.price,
-                "image_url1": item.image_url1
+                "image_url1": item.image_url1,
+                "owner_id": item.owner_id
             }
             for item in user.items
         ]

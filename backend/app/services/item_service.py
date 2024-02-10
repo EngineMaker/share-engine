@@ -78,7 +78,7 @@ async def get_item_detail(db: AsyncSession, item_id: int, user_id: int):
         if not rent_log:
             raise Exception("Item has rent by Unknown")
         renter_id = rent_log.renter_id
-    item.renter_id = renter_id
+        item.renter_id = renter_id
 
     return item
 
@@ -165,3 +165,8 @@ async def create_item(db: AsyncSession, user_id, item_data: dict, images: List[b
     await db.commit()
     await db.refresh(new_item)
     return new_item
+
+async def get_rental_item_list(db: AsyncSession, user_id: int):
+    rent_log_result = await db.execute(
+        select(RentLog)
+    )
