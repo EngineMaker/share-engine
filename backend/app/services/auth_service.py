@@ -14,7 +14,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # トークン取得用のURLを指定
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# TODO: Secrets管理
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ALGORITHM = os.environ.get("HASH_ALGORITHM")
 
