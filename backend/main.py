@@ -1,9 +1,11 @@
-import os
+from fastapi import FastAPI
 
-from flask import Flask
+app = FastAPI()
 
-app = Flask(__name__)
+@app.get("/")
+async def read_root():
+    return {"Hello": "World"}
 
-@app.route("/api/<int:api_id>")
-def show_api(api_id):
-    return f"Api {api_id}"
+@app.get("/health")
+def health():
+    return {200: "OK!"}
