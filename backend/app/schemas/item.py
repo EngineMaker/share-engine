@@ -30,6 +30,7 @@ class ItemList(BaseModel):
     available: bool
     price: int
     image_url1: Optional[str] = None
+    owner_id: int
 
     class Config:
         orm_mode = True
