@@ -280,6 +280,26 @@ resource "google_service_account" "cloudrun_sa" {
   account_id = "cloudrun-sa"
 }
 
+resource "google_service_account" "gcs_sa" {
+  account_id = "gcs-sa"
+}
+
+resource "google_service_account_key" "service_account" {
+  service_account_id = google_service_account.gcs_sa.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+resource "local_file" "service_account" {
+    content  = base64decode(google_service_account_key.service_account.private_key)
+    filename = "credentials.json"
+}
+
+resource "google_storage_bucket_iam_member" "gcs" {
+  bucket = google_storage_bucket.default.name
+  role = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_service_account.gcs_sa.email}"
+}
+
 resource "random_id" "bucket_prefix" {
   byte_length = 8
 }
