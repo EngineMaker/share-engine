@@ -17,6 +17,8 @@ RUN poetry config virtualenvs.create false \
 COPY ./app ./app
 COPY ./scripts ./scripts
 
+RUN mkdir /app/tmp
+
 # RUN pip install --no-cache-dir -r requirements.txt
 
 # CMD exec gunicorn --bind :8080 --workers 1 --threads 8 --timeout 0 main:app
