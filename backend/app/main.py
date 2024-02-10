@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import user, item, auth
+from routes import user, item, auth, file
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -24,6 +24,7 @@ api_prefix = "/api/v1"
 app.include_router(user.router, prefix=api_prefix)
 app.include_router(item.router, prefix=api_prefix)
 app.include_router(auth.router, prefix=api_prefix)
+app.include_router(file.router, prefix=api_prefix)
 
 @app.get("/")
 async def read_root():
