@@ -26,4 +26,3 @@ variable "db_user" {
   description = "Database user"
   type        = string
 }
-

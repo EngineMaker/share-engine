@@ -1,13 +1,16 @@
 import React from 'react';
-import { Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
+import PublishScreen from './screens/PublishScreen';
+import ProfileScreen from './screens/ProfileScreen';
 import { DetailsScreen } from './screens/DetailScreen';
 import LoginScreen from './screens/LoginScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const MainStack = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 
 const LoginStackScreen = () => (
@@ -17,7 +20,6 @@ const LoginStackScreen = () => (
       component={LoginScreen}
       options={{ title: 'Login Screen' }}
     />
-    <LoginStack.Screen name="Details" component={DetailsScreen} />
   </LoginStack.Navigator>
 );
 
@@ -26,24 +28,48 @@ const HomeStackScreen = () => (
     <HomeStack.Screen
       name="Home"
       component={HomeScreen}
-      options={{ title: 'Home Screen' }}
+      options={{ headerShown: false }}
     />
-    <HomeStack.Screen name="Details" component={DetailsScreen} />
+    <HomeStack.Screen
+      name="Details"
+      component={DetailsScreen}
+      options={{ headerShown: false }}
+    />
   </HomeStack.Navigator>
+);
+
+const HomeTabScreen = () => (
+  <Tab.Navigator initialRouteName="Home">
+    <Tab.Screen
+      name="HomeStack"
+      component={HomeStackScreen}
+      options={{ headerShown: false }}
+    />
+    <Tab.Screen
+      name="Publish"
+      component={PublishScreen}
+      options={{ headerShown: false }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{ headerShown: false }}
+    />
+  </Tab.Navigator>
 );
 
 function App() {
   return (
     <NavigationContainer>
-      <MainStack.Navigator initialRouteName="Login">
+      <MainStack.Navigator initialRouteName="HomeTab">
         <MainStack.Screen
           name="LoginStack"
           component={LoginStackScreen}
           options={{ headerShown: false }}
         />
         <MainStack.Screen
-          name="HomeStack"
-          component={HomeStackScreen}
+          name="HomeTab"
+          component={HomeTabScreen}
           options={{ headerShown: false }}
         />
       </MainStack.Navigator>
