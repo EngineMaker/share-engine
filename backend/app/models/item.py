@@ -19,3 +19,4 @@ class Item(Base):
 
     owner = relationship("User", back_populates="items")
     groups = relationship("GroupItem", back_populates="item")
+    rent_logs = relationship("RentLog", back_populates="item")

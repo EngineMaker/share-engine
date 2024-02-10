@@ -19,6 +19,8 @@ async def get_detail(db: AsyncSession, user_id: int):
         .options(joinedload(UserModel.items))
     )
     user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
     user_detail = UserDetail(
         name=user.name,
@@ -44,9 +46,6 @@ async def get_detail(db: AsyncSession, user_id: int):
             for item in user.items
         ]
     )
-
-    if not user:
-            raise HTTPException(status_code=404, detail="User not found")
     return user_detail
 
 async def get_groups(db: AsyncSession, user_id: int):

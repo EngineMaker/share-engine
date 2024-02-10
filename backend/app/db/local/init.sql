@@ -43,6 +43,17 @@ CREATE TABLE IF NOT EXISTS group_items (
     FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
+-- rent_logs テーブルの作成
+CREATE TABLE IF NOT EXISTS rent_logs (
+    id SERIAL PRIMARY KEY,
+    item_id INTEGER NOT NULL,
+    renter_id INTEGER NOT NULL,
+    returned BOOLEAN DEFAULT '0',
+    returned_at DATE,
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (renter_id) REFERENCES users(id)
+);
+
 -- サンプルデータの挿入
 INSERT INTO users (name) VALUES ('Alice'), ('Bob');
 INSERT INTO groups (name) VALUES ('Group1'), ('Group2');
@@ -57,3 +68,8 @@ INSERT INTO items (name, description, image_url1, owner_id, available, price, pr
 INSERT INTO group_items (group_id, item_id) VALUES
 (1, 1),
 (2, 2);
+
+-- rent_logs テーブルにサンプルデータの挿入
+INSERT INTO rent_logs (item_id, renter_id, returned, returned_at) VALUES
+(1, 2, '1', '2024-01-01 12:23:34'),
+(2, 1, '0', NULL);

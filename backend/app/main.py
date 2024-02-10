@@ -9,6 +9,7 @@ from models.group import Group
 from models.user_group import UserGroup
 from models.item import Item
 from models.group_item import GroupItem
+from models.rent_log import RentLog
 
 app = FastAPI()
 
