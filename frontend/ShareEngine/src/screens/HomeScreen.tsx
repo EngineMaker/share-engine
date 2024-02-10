@@ -105,27 +105,13 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             <CustomButton
                 title={'debug fetch items'}
                 onPress={async () => {
-                    await fetchItems().then((res) => {
+                    await fetchItems()
+                    .catch((error) => {
+                        console.error('Error fetching items:', error);
+                    })
+                    .then((res) => {
                         console.log('Fetched items:', res);
                         setNewItems(res);
-                        // setItems([...items,
-                        //     ...res.map((item: ItemProps) => ({
-                        //         // name: item.name,
-                        //         // status: res.available,
-                        //         // price: item.price,
-                        //         // id: res.id,
-                        //         // photos: [res.image_url1, res.image_url2, res.image_url3, res.image_url4].filter(Boolean),
-                        //         // owner: res.owner ? res.owner : 'unknown',
-                        //         // description: res.description,
-                        //         name: item.name,
-                        //         status: res.available,
-                        //         price: item.price,
-                        //         id: res.id,
-                        //         photos: [res.image_url1, res.image_url2, res.image_url3, res.image_url4].filter(Boolean),
-                        //         owner: res.owner ? res.owner : 'unknown',
-                        //         description: res.description,
-                        //     }))
-                        // ]);
                     });
                 }}
             />

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {NumberInput, CustomButton} from '../components/SmallComponents';
+import { postNewItem } from '../Utils';
 
 const PublishScreen = ({navigation}: {navigation: any}) => {
   const [itemName, setItemName] = useState('');
@@ -34,14 +35,27 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
-  const saveItem = () => {
+  const saveItem = async () => {
 	// 画像
 	// アイテム名
 	// 説明文
 	// 注意事項
 	// 貸出日数上限
 	// 貸出金額
-	console.log('登録ボタンが押されました');
+    const body = {
+        "name": itemName,
+        "price": loanAmount,
+        "description": description,
+        "precaution": caution,
+    }
+    console.log("item:", body);
+    const response = await postNewItem(body).then((res) => {
+        console.log('Posted new item:', res);
+        navigation.navigate( 'Home' );
+    })
+    .catch((error) => {
+        console.error('Error posting new item:', error);
+    });
   }
 
   useLayoutEffect(() => {

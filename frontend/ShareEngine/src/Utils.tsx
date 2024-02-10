@@ -89,6 +89,16 @@ export const fetchItems = async () => {
     }
 }
 
+export const postNewItem = async (item: any) => {
+    const body = item;
+    console.log('Posting new item:', body);
+    const method = 'POST';
+    const response = await fetcher(itemsUrl, method, body);
+    console.log('Response:', response);
+    return response;
+}
+
+
 export const fetcher = async (url: string, method: string, body?: any) => {
     const response = await fetch(url, {
         method: method,
