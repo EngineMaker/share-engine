@@ -11,8 +11,8 @@ class UserList(BaseModel):
 
 class UserDetail(BaseModel):
     name: str
-    own_items: list[ItemList]
-    rent_items: list[ItemList]
+    own_items: Optional[list[ItemList]]
+    rent_items: Optional[list[ItemList]]
     class Config:
         orm_mode = True
 

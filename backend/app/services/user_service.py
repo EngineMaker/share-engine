@@ -4,7 +4,9 @@ from sqlalchemy.orm import joinedload
 from db.database import get_session
 from models.user import User as UserModel
 from models.user_group import UserGroup as UserGroupModel
+from models.rent_log import RentLog
 from schemas.user import UserDetail
+from fastapi import HTTPException
 
 
 async def get_all(db: AsyncSession):
@@ -21,6 +23,14 @@ async def get_detail(db: AsyncSession, user_id: int):
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # 自分が借りているアイテム一覧の取得
+    rent_logs = await db.execute(
+        select(RentLog)
+        .where(RentLog.renter_id == user_id, RentLog.returned == False)
+        .options(joinedload(RentLog.item))
+    )
+    rent_logs = rent_logs.scalars().all()
 
     user_detail = UserDetail(
         name=user.name,
@@ -33,19 +43,18 @@ async def get_detail(db: AsyncSession, user_id: int):
                 "image_url1": item.image_url1,
                 "owner_id": user.id
             }
-            for item in user.items
+            for item in user.items if user.items
         ],
         rent_items=[
-            # TODO: 自分が借りているアイテム一覧の取得
             {
-                "id": item.id,
-                "name": item.name,
-                "available": item.available,
-                "price": item.price,
-                "image_url1": item.image_url1,
-                "owner_id": item.owner_id
+                "id": rent_log.item.id,
+                "name": rent_log.item.name,
+                "available": rent_log.item.available,
+                "price": rent_log.item.price,
+                "image_url1": rent_log.item.image_url1,
+                "owner_id": rent_log.item.owner_id
             }
-            for item in user.items
+            for rent_log in rent_logs if rent_logs
         ]
     )
     return user_detail

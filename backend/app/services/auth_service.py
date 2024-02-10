@@ -70,7 +70,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
         user_id: int = payload.get("user_id")
         if username is None or user_id is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
+        token_data = TokenData(username=username, user_id=user_id)
+    except jwt.PyJWTError:
         raise credentials_exception
     return token_data
