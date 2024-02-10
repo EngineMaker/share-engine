@@ -27,7 +27,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 console.log('Setting user');
                 // await setSecureItem('user', username);
                 console.log('User logged in');
-                navigation.navigate('HomeStack', { screen: 'Home' });
+                navigation.navigate('HomeTab', { screen: 'Home' });
             } catch (error) {
                 console.log(error);
             }
