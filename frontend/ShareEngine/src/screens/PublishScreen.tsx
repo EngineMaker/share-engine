@@ -152,13 +152,12 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         {/* 貸出金額入力 */}
         <View style={styles.row}>
           <Text style={styles.textLabelRow}>貸出金額</Text>
-          <NumberInput
-            value={loanAmount}
-            onChangeText={setLoanAmount}
+        <NumberInput
+            value={"¥" + loanAmount}
+            onChangeText={(text) => setLoanAmount(text.replace(/¥/g, ''))}
             placeholder="¥300"
-            //   style
             style={[styles.input, styles.inputColor]}
-          />
+        />
         </View>
 
         <TouchableOpacity onPress={saveItem}>
