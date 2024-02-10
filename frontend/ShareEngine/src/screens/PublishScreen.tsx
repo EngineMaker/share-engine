@@ -53,18 +53,6 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
       });
   };
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => navigation.goBack()}>
-          <Text>X</Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
   return (
     <SafeAreaView>
       <ScrollView>
@@ -152,12 +140,12 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         {/* 貸出金額入力 */}
         <View style={styles.row}>
           <Text style={styles.textLabelRow}>貸出金額</Text>
-        <NumberInput
-            value={"¥" + loanAmount}
-            onChangeText={(text) => setLoanAmount(text.replace(/¥/g, ''))}
+          <NumberInput
+            value={'¥' + loanAmount}
+            onChangeText={text => setLoanAmount(text.replace(/¥/g, ''))}
             placeholder="¥300"
             style={[styles.input, styles.inputColor]}
-        />
+          />
         </View>
 
         <TouchableOpacity onPress={saveItem}>
@@ -243,12 +231,6 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 5,
   },
-  // container: {
-  //     flex: 1,
-  //     alignItems: 'center',
-  //     justifyContent: 'flex-start',
-  //     paddingTop: 20,
-  // },
   closeButton: {
     marginRight: 20,
     marginBottom: 10,
