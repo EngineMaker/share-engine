@@ -13,4 +13,9 @@ def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
 
     blob.upload_from_filename(source_file_name)
 
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+    # 公開URLを取得
+    public_url = blob.public_url
+
+    print(f"File {source_file_name} uploaded to {public_url}.")
+
+    return public_url
