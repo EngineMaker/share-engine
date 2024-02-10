@@ -8,7 +8,7 @@ from schemas.user import UserDetail as UserDetailSchema
 from schemas.user import UserList as UserListSchema
 from schemas.user import UserCreate as UserCreateSchema
 from services import user_service
-from services.auth_service import get_current_user, TokenData
+from services.auth_service import get_current_user, TokenData, hash_password
 
 router = APIRouter()
 
@@ -22,7 +22,7 @@ async def read_user(user_id: int, db: AsyncSession = Depends(get_session)):
 
 @router.post("/users/")
 async def create_user(user_create: UserCreateSchema, db: AsyncSession = Depends(get_session)):
-    hashed_password = auth_service.hash_password(user_create.password)
+    hashed_password = hash_password(user_create.password)
     new_user = UserModel(name=user_create.name, hashed_password=hashed_password)
     db.add(new_user)
     await db.commit()
