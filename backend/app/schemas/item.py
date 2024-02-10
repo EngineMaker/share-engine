@@ -6,6 +6,7 @@ class ItemCreate(BaseModel):
     price: Optional[int] = 0
     description: str
     precaution: Optional[str]
+    group_ids: list[int]
     # images: list[bytes] = []
 
 class ItemResponse(BaseModel):

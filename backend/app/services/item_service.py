@@ -133,8 +133,22 @@ async def create_item(db: AsyncSession, user_id, item_data: dict, images: List[b
     # image_urls = await upload_images_to_gcs(images)
     # image_urlsの長さに応じて、image_url1~5を設定
     # new_item = Item(**item_data, **{f"image_url{i+1}": url for i, url in enumerate(image_urls)})
-    new_item = ItemModel(**item_data, image_url1="https://placehold.jp/300x200.png", available=True, owner_id=user_id)
+    new_item = ItemModel(
+        name=item_data.get('name'), 
+        price=item_data.get('price'),
+        description=item_data.get('description'),
+        precaution=item_data.get('precaution'),
+        image_url1="https://placehold.jp/300x200.png", 
+        available=True, 
+        owner_id=user_id)
     db.add(new_item)
+    await db.flush()
+    for group_id in item_data.get('group_ids'):
+        new_group_item = GroupItemModel(
+            group_id=group_id,
+            item_id=new_item.id
+        )
+        db.add(new_group_item)
     await db.commit()
     await db.refresh(new_item)
     return new_item
