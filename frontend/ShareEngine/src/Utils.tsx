@@ -1,9 +1,26 @@
 import { useEffect, useState } from "react";
 import RNSecureStorage, {ACCESSIBLE} from 'rn-secure-storage';
 
+export const handleLogout = async (navigation: any) => {
+    console.log('Logging out');
+    if (await existsSecureItem('user')) {
+        await removeSecureItem('user');
+    }
+    if (await existsSecureItem('token')) {
+        await removeSecureItem('token');
+    }
+    if (await existsSecureItem('userid')) {
+        await removeSecureItem('userid');
+    }
+    console.log(navigation);
+    navigation.navigation.navigate('LoginStack', { screen: 'Login' });
+}
+
 export const getUserID = async () => {
-    const userID = await getSecureItem('user_id');
-    return userID;
+    if (await existsSecureItem('userid')) {
+        return await getSecureItem('userid');
+    }
+    return '';
 }
 
 export const setSecureItem = async (key: string, value: string) => {
@@ -22,7 +39,8 @@ export const getSecureItem = async (key: string) => {
             console.log(error);
             return error;
         }
-    );
+    )
+    console.log('RNSecureStorage.getItem ' + key + ':', result);
     return result;
 }
 
@@ -36,10 +54,9 @@ export const removeSecureItem = async (key: string) => {
 }
 
 export const existsSecureItem = async (key: string) => {
-    console.log('existsSecureItem called with key:', key);
     try {
         const result = await RNSecureStorage.exist(key);
-        console.log('RNSecureStorage.exist result:', result);
+        console.log('RNSecureStorage.exist ' + key + ':', result);
         return result;
     } catch (error) {
         console.error('Error in RNSecureStorage.exist:', error);
@@ -47,17 +64,10 @@ export const existsSecureItem = async (key: string) => {
     }
 }
 
-export const otherFetch = async () => {
-    const url = 'http://34.71.228.117/api/v1/users/1';
-    const method = 'GET';
-    const response = await fetcher(url, method);
-    console.log('Fetched user with fetcher:', response);
-}
-
-export const fetchUser = async () => {
+export const fetchUserRequest = async (user_id: string) => {
     try {
-        console.log('Fetching user');
-        const response = await fetch('http://34.71.228.117/api/v1/users/1');
+        const url = 'http://localhost:8000/api/v1/users/' + user_id;
+        const response = await fetch(url);
         console.log('Status code:', response.status);
         const data = await response.json();
         return data;

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
-import { fetchItemDetailsRequest, fetchItemsRequest, fetchUser, otherFetch } from "../Utils";
+import { fetchItemDetailsRequest, fetchItemsRequest, fetchUserRequest } from "../Utils";
 import { CustomButton } from "../components/SmallComponents";
 
 

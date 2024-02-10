@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
 import {HorizontalList} from '../components/HorizontalScrollList';
 import {dummyItems} from '../dummyItems';
 import { ItemProps } from '../components/Item';
+import { fetchUserRequest, getUserID, handleLogout } from '../Utils';
+import { CustomButton } from '../components/SmallComponents';
 
 const ellipseImage = require('../images/ellipse.png');
 
@@ -20,7 +22,7 @@ interface User {
   history: ItemProps[];
 }
 
-const ProfileScreen = ({}) => {
+const ProfileScreen = (navigation: any) => {
   const tmpDummyItems = dummyItems;
   const dummyUser = {
     name: 'ヤマザキ',
@@ -28,7 +30,44 @@ const ProfileScreen = ({}) => {
     lending: tmpDummyItems.slice(3, 7),
     history: [] as ItemProps[],
   };
-  const [user, setUser] = React.useState<User>(dummyUser);
+  const [user, setUser] = React.useState<User>({
+    name: '',
+    borrowing: [],
+    lending: [],
+    history: [],
+  });
+  const name = user.name;
+
+  useEffect(() => {
+    if (user.name === '') {
+      handleGetUser();
+    }
+  }, []);
+
+  const handleGetUser = async () => {
+    // TODO: Get user ID from endpoint
+    // const user_id = await getUserID();
+    const user_id = "3";
+    console.log('Fetching user with ID:', user_id);
+    // if (user_id === '') {
+    //   console.log('User ID not found');
+    //   // handleLogout(navigation);
+    //   return;
+    // }
+    await fetchUserRequest(user_id).then((res) => {
+      console.log('Fetched user:', res);
+      setUser({
+        name: res.name,
+        borrowing: res.own_items,
+        lending: res.rent_items,
+        history: [] as ItemProps[],
+      });
+    }
+    ).catch((error) => {
+      console.error('Error fetching user:', error);
+    });
+  }
+
   
   return (
     <SafeAreaView style={styles.container}>
@@ -44,10 +83,12 @@ const ProfileScreen = ({}) => {
           }}
         />
       </View>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}
+        scrollEnabled={false}
+      >
         <View style={styles.userInfoSection}>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user.name}</Text>
+            <Text style={styles.userName}>{name}</Text>
             <Text style={{marginBottom: 4, color: 'white'}}>
               貸しているアイテム数: {user.borrowing.length}
             </Text>
@@ -70,6 +111,16 @@ const ProfileScreen = ({}) => {
         <Text style={styles.sectionTitle}>履歴</Text>
         <HorizontalList itemList={user.history} />
       </ScrollView>
+      {/* <CustomButton
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          backgroundColor: 'darkviolet',
+          width: '100%',
+        }}
+        title={'ユーザ情報を取得'}
+        onPress={handleGetUser}
+      /> */}
     </SafeAreaView>
   );
 };

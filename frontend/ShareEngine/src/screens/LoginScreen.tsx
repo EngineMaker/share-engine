@@ -9,7 +9,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [user, setUser] = useState('');
-    const [userID, setUseID] = useState('');
+    const [userID, setUserID] = useState('');
     const [loggedIn, setLoggedIn] = useState(false);
     const [token, setToken] = useState('no token');
 
@@ -21,21 +21,22 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
             setLoggedIn(loggedIn || false);
             setUser(await getSecureItem('user'));
             setToken(isToken ? await getSecureItem('token') : 'no token');
-        };
-        checkLogin();
-    }, [user]);
-
-    useEffect(() => {
-        const checkLogin = async () => {
-            console.log('Checking login');
-            const loggedIn = await existsSecureItem('user');
-            console.log('Logged in:', loggedIn);
-            if (loggedIn) {
-                // navigation.navigate('HomeStack', { screen: 'Home' });
-            }
+            setUserID(await getSecureItem('userid'));
         };
         checkLogin();
     }, []);
+
+    // useEffect(() => {
+    //     const checkLogin = async () => {
+    //         console.log('Checking login');
+    //         const loggedIn = await existsSecureItem('user');
+    //         console.log('Logged in:', loggedIn);
+    //         if (loggedIn) {
+    //             // navigation.navigate('HomeStack', { screen: 'Home' });
+    //         }
+    //     };
+    //     checkLogin();
+    // }, []);
 
     const handleLogin = async () => {
         console.log(username, password);
@@ -53,8 +54,8 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                         setSecureItem('token', data.access_token).then(() => {
                             setToken(data.access_token);
                         });
-                        setSecureItem('user_id', data.user_id).then(() => {
-                            setUseID(data.user_id);
+                        setSecureItem('userid', data.user_id).then(() => {
+                            setUserID(data.user_id.toString());
                         });
                         setLoggedIn(true);
                         navigation.navigate('HomeStack', { screen: 'Home' });
@@ -76,7 +77,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         setLoggedIn(false);
         setUser('');
         setToken('');
-        await removeSecureItem('user_id');
+        await removeSecureItem('userid');
         await removeSecureItem('token');
         console.log('User logged out');
     }
