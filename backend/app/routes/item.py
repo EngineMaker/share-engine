@@ -10,14 +10,18 @@ from models.rent_log import RentLog
 router = APIRouter()
 
 @router.get("/items/", response_model=List[ItemList])
-async def read_items(user_id=1, db: AsyncSession = Depends(get_session)):
+async def read_items(db: AsyncSession = Depends(get_session)):
+    # TODO: login_user_idの取得
+    user_id = 1
     items = await get_items_for_user_groups(db, user_id)
     if not items:
         raise HTTPException(status_code=404, detail="Items not found")
     return items
 
 @router.get("/items/{item_id}", response_model=ItemDetail)
-async def read_item_detail(item_id: int, user_id=1, db: AsyncSession = Depends(get_session)):
+async def read_item_detail(item_id: int, db: AsyncSession = Depends(get_session)):
+    # TODO: login_user_idの取得
+    user_id = 1
     item = await get_item_detail(db, item_id, user_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
