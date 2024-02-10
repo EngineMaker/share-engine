@@ -58,9 +58,9 @@ CREATE TABLE IF NOT EXISTS rent_logs (
 -- 全体のクリア
 TRUNCATE TABLE users, groups, user_groups, items, group_items, rent_logs;
 -- サンプルデータの挿入
-INSERT INTO users (name, hashed_password) VALUES ('Alice', 'Passw0rd'), ('Bob', 'P4ssword');
+INSERT INTO users (name, hashed_password) VALUES ('Alice', 'Passw0rd'), ('Bob', 'P4ssword'), ('Mike', 'P4ssw0rd');
 INSERT INTO groups (name) VALUES ('EngineMaker新宿'), ('EngineMake成田');
-INSERT INTO user_groups (user_id, group_id, is_admin) VALUES (1, 1, TRUE), (2, 2, FALSE);
+INSERT INTO user_groups (user_id, group_id, is_admin) VALUES (1, 1, TRUE), (2, 2, FALSE), (3, 1, FALSE);
 
 -- items テーブルにサンプルデータの挿入
 INSERT INTO items (name, description, image_url1, owner_id, available, price, precaution) VALUES
@@ -74,5 +74,5 @@ INSERT INTO group_items (group_id, item_id) VALUES
 
 -- rent_logs テーブルにサンプルデータの挿入
 INSERT INTO rent_logs (item_id, renter_id, returned, returned_at) VALUES
-(1, 1, '0', NULL),
+(1, 3, '0', NULL),
 (2, 2, '0', NULL);
