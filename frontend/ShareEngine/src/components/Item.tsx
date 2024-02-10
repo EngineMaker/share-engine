@@ -45,10 +45,9 @@ export const ItemCard = ({
     price,
     id,
     photos,
+    owner,
     onPress,
     onLongPress,
-    onEdit,
-    onDelete,
 }: ItemCardProps) => {
     return (
         <TouchableOpacity
@@ -64,21 +63,41 @@ export const ItemCard = ({
                 alignItems: 'center',
             }}
         >
-            {/* <Text style={styles.title}>{name}</Text> */}
-            <Image
-                style={styles.image}
-                source={photos ? { uri: photos[0] } : require(placeholder)}
-            />
-            <Text style={styles.subtitle}>{status ? "Available" : "Rented"}</Text>
-            {price === 0 ? (
-                <Text style={styles.subtitle}>Free</Text>
-            ) : (
-                <Text style={styles.subtitle}>{price} ¥</Text>
-            )}
-            {/* <View style={{ flexDirection : "row", justifyContent: "space-between" }}>
-                <Button title="Edit" onPress={onEdit} />
-                <Button title="Delete" onPress={onDelete} />
-            </View> */}
+            <View
+                style={{
+                    width: "100%",
+                    height: "90%",
+                    overflow: 'hidden',
+                }}
+            >
+                <Image
+                    style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+                    source={photos ? { uri: photos[0] } : require(placeholder)}
+                />
+                <View style={{ position: 'absolute', backgroundColor: status ? 'transparent' : 'rgba(0, 0, 0, 0.5)', width: "100%", height: "100%" }} />
+                {status ? null : 
+                    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>貸出中</Text>
+                    </View>
+                }
+                <Text style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', fontSize: 15, fontWeight: 'bold', padding: 5 }}>{name}</Text>
+            </View>
+            <View
+                style={{
+                    width: "100%",
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    flexDirection: 'row',
+                    paddingHorizontal: 5,
+                }}
+                >
+                <Text style={styles.subtitle}>{owner}</Text>
+                {price === 0 ? (
+                    <Text style={styles.subtitle}>Free</Text>
+                ) : (
+                    <Text style={styles.subtitle}>¥{price}/日</Text>
+                )}
+            </View>
         </TouchableOpacity>
     );
 }

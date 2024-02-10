@@ -8,8 +8,8 @@ export const dummyItems: ItemProps[] = [
         id: "a1b2c3d4",
         photos: ["https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-family-hero?wid=940&hei=1112&fmt=jpeg&qlt=80&.v=1604021662000", "https://cdn.mos.cms.futurecdn.net/r3GihyTvkBBbiG3wTTsP99-1200-80.jpg.webp"],
         owner: "John Doe",
-        description: "A high-end smartphone with advanced features.",
-        precaution: "Handle with care.",
+        description: "A high-end smartphone with advanced features. ここに説明文がはいります。ここに説明文がはいります。ここに説明文がはいります。ここに説明文がはいります。ここに説明文がはいります。ここに説明文がはいります。",
+        precaution: "Handle with care. ここに注意事項がはいります。ここに注意事項が入ります。ここに注意事項がはいります。ここに注意事項が入ります。ここに注意事項がはいります。ここに注意事項が入ります。",
         days: 7,
     },
     {

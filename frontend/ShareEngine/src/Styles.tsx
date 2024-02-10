@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     cardText: {
-        fontSize: 25,
+        fontSize: 21,
     },
     title: {
         fontSize: 18,
@@ -67,6 +67,21 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 14,
+    },
+    gradient: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#3b5998',
+        position: 'relative',
+    },
+    gradientBackground: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        opacity: 0.8,
     },
 });
 

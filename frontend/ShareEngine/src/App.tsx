@@ -7,6 +7,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import { DetailsScreen } from './screens/DetailScreen';
 import LoginScreen from './screens/LoginScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const MainStack = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
@@ -60,20 +61,22 @@ const HomeTabScreen = () => (
 
 function App() {
   return (
-    <NavigationContainer>
-      <MainStack.Navigator initialRouteName="HomeTab">
-        <MainStack.Screen
-          name="LoginStack"
-          component={LoginStackScreen}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen
-          name="HomeTab"
-          component={HomeTabScreen}
-          options={{ headerShown: false }}
-        />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <MainStack.Navigator initialRouteName="HomeTab">
+          <MainStack.Screen
+            name="LoginStack"
+            component={LoginStackScreen}
+            options={{ headerShown: false }}
+          />
+          <MainStack.Screen
+            name="HomeTab"
+            component={HomeTabScreen}
+            options={{ headerShown: false }}
+          />
+        </MainStack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 
