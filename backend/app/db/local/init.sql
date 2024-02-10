@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS rent_logs (
 -- 全体のクリア
 TRUNCATE TABLE users, groups, user_groups, items, group_items, rent_logs;
 -- サンプルデータの挿入
-INSERT INTO users (name, hashed_password) VALUES ('Alice', 'Passw0rd'), ('Bob', 'P4ssword'), ('Mike', 'P4ssw0rd');
+INSERT INTO users (name, hashed_password) VALUES ('tokisaba', '$2b$12$bJuaocGKtxgwCoeTtxAEiOLQY/fpZMr61V/wqGbs1W41uzyz0wNk2'), ('Alice', 'Passw0rd'), ('Bob', 'P4ssword'), ('Mike', 'P4ssw0rd');
 INSERT INTO groups (name) VALUES ('EngineMaker新宿'), ('EngineMake成田');
 INSERT INTO user_groups (user_id, group_id, is_admin) VALUES (1, 1, TRUE), (2, 2, FALSE), (3, 1, FALSE);
 
