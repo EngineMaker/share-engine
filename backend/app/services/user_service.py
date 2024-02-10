@@ -36,3 +36,14 @@ async def find_by_id(db: AsyncSession, user_id: int):
     if not user:
             raise HTTPException(status_code=404, detail="User not found")
     return user_detail
+
+async def get_groups(db: AsyncSession, user_id: int):
+
+    result = await db.execute(
+        select(UserModel)
+        .where(UserModel.id == user_id)
+        .options(joinedload(UserModel.groups).joinedload(UserGroupModel.group))
+    )
+    user = result.scalars().first()
+    group_ids = [ug.group.id for ug in user.groups]
+    return group_ids
