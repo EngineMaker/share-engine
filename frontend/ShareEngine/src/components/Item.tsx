@@ -75,6 +75,7 @@ export const ItemCard = ({
                 justifyContent: 'flex-start',
                 alignItems: 'center',
             }}
+            activeOpacity={0.7}
         >
             <View
                 style={{

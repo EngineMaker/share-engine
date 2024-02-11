@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, SafeAreaView, Image, Dimensions, Animated, Modal, TouchableWithoutFeedback } from "react-native";
+import { View, Text, SafeAreaView, Image, Dimensions, Animated, Modal, TouchableWithoutFeedback, ActivityIndicator } from "react-native";
 import { ItemDetailedProps, ItemProps } from "../components/Item";
 import { CustomButton } from "../components/SmallComponents";
 import styles from "../Styles";
@@ -31,11 +31,14 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const photos = rentalItem ? rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean) : [];
     const days = rentalItem ? rentalItem.days ? rentalItem.days : 1 : 1;
     const [isRenter, setIsRenter] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const ownerNames = ['Shima', 'Tokisaba', 'Yamazaki', 'Yuuki', 'Andrei', 'Shio', 'Sekine', 'Satoru', 'Conpota', 'Nakajima'];
 
 
     useEffect(() => {
         const fetchData = async () => {
-            const userID = await getUserID();
+            setIsLoading(true);
+            const userID = await getUserID().finally(() => setIsLoading(false));
             const newIsRenter = rentalItem.renter_id == userID;
             setIsRenter(newIsRenter);
             console.log('Renter:', rentalItem.renter_id, 'User:', userID, 'isRenter:', newIsRenter);
@@ -49,8 +52,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
             console.log('FFFFetching item details:', itemObject.id);
                 if (itemObject.id !== undefined) {
                 console.log('FEeEEEetching item details:', itemObject.id);
+                setIsLoading(true);
                 try {
-                    const itemDetails = await fetchItemDetailsRequest(itemObject.id);
+                    const itemDetails = await fetchItemDetailsRequest(itemObject.id).finally(() => setIsLoading(false));
                     console.log('Fetched item details:', itemDetails);
                     setRentalItem(itemDetails);
                 } catch (error) {
@@ -59,6 +63,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
             }
         };
         fetchData();
+        // if (rentalItem && rentalItem.owner_id !== undefined) {
+            
+        // }
     }, []);
     
     useEffect(() => {
@@ -91,25 +98,32 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
 
     const rentItem = async () => {
         console.log('Renting:', rentalItem);
+        setIsLoading(true);
         await rentItemRequest(rentalItem.id)
         .then((res) => {
             if (res.status === 200) {
                 console.log('Rented!:', rentalItem.name);
                 setRentalItem({ ...rentalItem, available: false });
                 setIsRenter(true);
+                navigation.goBack();
             }
             else if (res.status === 400) {
                 console.log('Item already rented:', rentalItem.name);
                 setRentalItem({ ...rentalItem, available: false });
+                navigation.goBack();
             }
         })
         .catch((error) => {
-            console.error('Error renting:', error);
+            console.log('Error renting:', error);
+            navigation.goBack();
+        }).finally(() => {
+            setIsLoading(false);
         });
     }
 
     const returnItem = async () => {
         console.log('Renting:', rentalItem);
+        setIsLoading(true);
         await returnItemRequest(rentalItem.id)
         .then((res) => {
             console.log('Return status:', res);
@@ -127,6 +141,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         })
         .catch((error) => {
             console.error('Error renting:', error);
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
     }
 
@@ -159,10 +176,10 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={[styles.cardText,{ marginVertical: 1 }]}>{ rentalItem ? rentalItem.price !== undefined ? rentalItem.price > 0 ? '¥' + rentalItem.price + "/日" : 'Free' : 'Price not set' : 'Loading...'}</Text>
-                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem ? rentalItem.owner_id : "Loading..."}</Text>
+                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem ? ownerNames[rentalItem.owner_id as unknown as number] : "Loading..."}</Text>
                     </View>
                     <Text style={[styles.paragraph, { marginVertical: 5 }]}>
-                        {rentalItem ? rentalItem.description ? rentalItem.description.replace(/\\n/g, '\n') : 'Loading...' : 'Loading...'}
+                        {rentalItem ? rentalItem.description ? rentalItem.description.replace(/\\n/g, '\n').split('\n').map(s => s.trimStart()).join('\n') : 'Loading...' : 'Loading...'}
                     </Text>
                     <View>
                         <Text
@@ -176,11 +193,11 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 marginVertical: 5,
                             }}
                         >
-                            <Text>{rentalItem ? rentalItem.precaution ? rentalItem.precaution.replace(/\\n/g, '\n') : '特にない' : '特にない'}</Text>
+                            <Text>{rentalItem ? rentalItem.precaution ? rentalItem.precaution.replace(/\\n/g, '\n').split('\n').map(s => s.trimStart()).join('\n') : '特にない' : '特にない'}</Text>
                         </View>
                     </View>
                     {rentalItem && <CustomButton
-                        title={rentalItem.available ? '借りる詳細を決定する' : isRenter ? '返却する' : '現在貸出中です'}
+                        title={rentalItem.available ? '借りる' : isRenter ? '返却する' : '現在貸出中です'}
                         style={[
                             styles.button,
                             {
@@ -256,7 +273,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 <View style={{ borderBottomColor: '#CDCDCD', borderBottomWidth: 2, alignSelf: 'stretch', marginVertical: 5 }} />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30,}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>借りる相手</Text>
-                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{rentalItem.owner_id}</Text>
+                                    <Text style={[styles.cardText,{ marginVertical: 1 }]}>{ownerNames[rentalItem.owner_id as unknown as number]}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' , padding: 10, paddingHorizontal: 30, alignItems: 'center',}}>
                                     <Text style={[styles.cardText,{ marginVertical: 1 }]}>借りる日数</Text>
@@ -299,7 +316,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 </View>
                                 <View style={{ borderBottomColor: '#CDCDCD', borderBottomWidth: 2, alignSelf: 'stretch', marginVertical: 5 }} />
                                 <CustomButton
-                                    title="借りる"
+                                    title="確定"
                                     style={[
                                         styles.button,
                                         {
@@ -331,6 +348,30 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     </Animated.View>
                 </TouchableWithoutFeedback>
             </Modal>
+            {isLoading && <View
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    zIndex: 5,
+                }}
+            >
+                <ActivityIndicator
+                    size="large"
+                    color="white"
+                    animating={true}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                />
+            </View>}
         </SafeAreaView>
     );
 }

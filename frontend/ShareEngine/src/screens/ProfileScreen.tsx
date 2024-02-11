@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {HorizontalList} from '../components/HorizontalScrollList';
 import {dummyItems} from '../dummyItems';
-import { ItemProps } from '../components/Item';
+import { ItemDetailedProps, ItemProps } from '../components/Item';
 import { fetchUserRequest, getUserID, handleLogout, removeSecureItem } from '../Utils';
 import { CustomButton } from '../components/SmallComponents';
 import { useFocusEffect } from '@react-navigation/native';
@@ -19,8 +19,8 @@ const ellipseImage = require('../images/ellipse.png');
 
 interface User {
   name: string;
-  own_items: ItemProps[];
-  rent_items: ItemProps[];
+  own_items: ItemDetailedProps[];
+  rent_items: ItemDetailedProps[];
   // history: ItemProps[];
 }
 

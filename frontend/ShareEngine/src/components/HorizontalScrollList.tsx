@@ -1,13 +1,13 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Image} from 'react-native';
-import {ItemProps} from '../components/Item';
+import {ItemDetailedProps, ItemProps} from '../components/Item';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const HorizontalList = ({
   itemList,
   navigation,
 }: {
-  itemList: ItemProps[] | undefined;
+  itemList: ItemDetailedProps[] | undefined;
   navigation: any;
 }) => {
   return (
@@ -19,6 +19,7 @@ export const HorizontalList = ({
       ) : (
         <ScrollView horizontal={true} contentContainerStyle={styles.itemList}>
           {itemList.map((item, index) => {
+            console.log('Item:', item);
             return (
               <TouchableOpacity
                 key={index}
@@ -30,8 +31,7 @@ export const HorizontalList = ({
                   <Image
                     source={{
                       uri:
-                        item.photos && item.photos.length > 0
-                          ? item.photos[0]
+                        item.image_url1 ? item.image_url1
                           : 'https://placehold.jp/bdc1ff/ffffff/150x150.png',
                     }}
                     style={styles.itemImage}

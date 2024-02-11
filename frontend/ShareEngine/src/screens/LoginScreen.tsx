@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 console.log('Logged in:', res);
                 if (res.ok) {
                     res.json().then((data) => {
-                        console.log('Logged in:', data);
+                        console.log('Logged in?:', data);
                         setSecureItem('user', username).then(() => {
                             setUser(username);
                         });
@@ -140,7 +140,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 </Text>
             </View> */}
             <View
-                style={{ position: 'absolute', bottom: 100, width: '100%', alignItems: 'center' }}
+                style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10 }}
             >
                 <Text
                     style={{ color: 'white', fontSize: 20, fontStyle: 'italic', textAlign: 'center', textAlignVertical: 'center' }}
@@ -223,7 +223,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                     width: '100%',
                     height: '100%',
                     position: 'absolute',
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
                     zIndex: 5,
                 }}
             >
