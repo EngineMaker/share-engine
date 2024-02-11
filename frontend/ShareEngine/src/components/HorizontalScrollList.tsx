@@ -1,11 +1,14 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Image} from 'react-native';
 import {ItemProps} from '../components/Item';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const HorizontalList = ({
   itemList,
+  navigation,
 }: {
   itemList: ItemProps[] | undefined;
+  navigation: any;
 }) => {
   return (
     <View style={styles.background}>
@@ -17,17 +20,35 @@ export const HorizontalList = ({
         <ScrollView horizontal={true} contentContainerStyle={styles.itemList}>
           {itemList.map((item, index) => {
             return (
-              <View key={index}>
-                <Image
-                  source={{
-                    uri:
-                      item.photos && item.photos.length > 0
-                        ? item.photos[0]
-                        : 'https://placehold.jp/bdc1ff/ffffff/150x150.png',
-                  }}
-                  style={styles.itemImage}
-                />
-              </View>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  console.log('Pressed item:', item)
+                  navigation.navigation.navigate('HomeStack', {screen: 'Details', params: {itemObject: item}});
+                  }}>
+                <View key={index}>
+                  <Image
+                    source={{
+                      uri:
+                        item.photos && item.photos.length > 0
+                          ? item.photos[0]
+                          : 'https://placehold.jp/bdc1ff/ffffff/150x150.png',
+                    }}
+                    style={styles.itemImage}
+                  />
+                </View>
+              </TouchableOpacity>
+              // {/* <View key={index}>
+              //   <Image
+              //     source={{
+              //       uri:
+              //         item.photos && item.photos.length > 0
+              //           ? item.photos[0]
+              //           : 'https://placehold.jp/bdc1ff/ffffff/150x150.png',
+              //     }}
+              //     style={styles.itemImage}
+              //   />
+              // </View> */}
             );
           })}
         </ScrollView>

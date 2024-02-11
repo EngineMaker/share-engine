@@ -12,14 +12,15 @@ import {dummyItems} from '../dummyItems';
 import { ItemProps } from '../components/Item';
 import { fetchUserRequest, getUserID, handleLogout } from '../Utils';
 import { CustomButton } from '../components/SmallComponents';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ellipseImage = require('../images/ellipse.png');
 
 interface User {
   name: string;
-  borrowing: ItemProps[];
-  lending: ItemProps[];
-  history: ItemProps[];
+  own_items: ItemProps[];
+  rent_items: ItemProps[];
+  // history: ItemProps[];
 }
 
 const ProfileScreen = (navigation: any) => {
@@ -32,22 +33,22 @@ const ProfileScreen = (navigation: any) => {
   };
   const [user, setUser] = React.useState<User>({
     name: '',
-    borrowing: [],
-    lending: [],
-    history: [],
+    own_items: [],
+    rent_items: [],
+    // history: [],
   });
   const name = user.name;
 
-  useEffect(() => {
-    if (user.name === '') {
+  useFocusEffect(
+    React.useCallback(() => {
       handleGetUser();
-    }
-  }, []);
+      return () => {};
+    }, [])
+  );
 
   const handleGetUser = async () => {
-    // TODO: Get user ID from endpoint
-    // const user_id = await getUserID();
-    const user_id = "3";
+    const user_id = await tryGetUserID();
+    // const user_id = "1";
     console.log('Fetching user with ID:', user_id);
     // if (user_id === '') {
     //   console.log('User ID not found');
@@ -58,16 +59,23 @@ const ProfileScreen = (navigation: any) => {
       console.log('Fetched user:', res);
       setUser({
         name: res.name,
-        borrowing: res.own_items,
-        lending: res.rent_items,
-        history: [] as ItemProps[],
+        own_items: res.own_items,
+        rent_items: res.rent_items,
+        // history: [] as ItemProps[],
       });
     }
     ).catch((error) => {
       console.error('Error fetching user:', error);
     });
   }
-
+  const tryGetUserID = async () => {
+    try {
+      const user_id = await getUserID();
+      return user_id;
+    } catch (error) {
+      console.error('Error getting user ID:', error);
+    }
+  }
   
   return (
     <SafeAreaView style={styles.container}>
@@ -90,26 +98,26 @@ const ProfileScreen = (navigation: any) => {
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{name}</Text>
             <Text style={{marginBottom: 4, color: 'white'}}>
-              貸しているアイテム数: {user.borrowing.length}
+              Own Items: {user.own_items.length}
             </Text>
             <Text style={{color: 'white'}}>
-              借りているアイテム数: {user.lending.length}
+              借りているアイテム数: {user.rent_items.length}
             </Text>
           </View>
-          <Image
+          {/* <Image
             source={{uri: 'https://via.placeholder.com/150'}}
             style={styles.profilePic}
-          />
+          /> */}
         </View>
 
+        <Text style={styles.sectionTitle}>My Items</Text>
+        <HorizontalList itemList={user.own_items} navigation={navigation} />
+
         <Text style={styles.sectionTitle}>借りているアイテム</Text>
-        <HorizontalList itemList={user.borrowing} />
+        <HorizontalList itemList={user.rent_items} navigation={navigation} />
 
-        <Text style={styles.sectionTitle}>貸しているアイテム</Text>
-        <HorizontalList itemList={user.lending} />
-
-        <Text style={styles.sectionTitle}>履歴</Text>
-        <HorizontalList itemList={user.history} />
+        {/* <Text style={styles.sectionTitle}>履歴</Text>
+        <HorizontalList itemList={user.history} /> */}
       </ScrollView>
       {/* <CustomButton
         style={{
@@ -119,7 +127,7 @@ const ProfileScreen = (navigation: any) => {
           width: '100%',
         }}
         title={'ユーザ情報を取得'}
-        onPress={handleGetUser}
+        onPress={tryGetUserID}
       /> */}
     </SafeAreaView>
   );

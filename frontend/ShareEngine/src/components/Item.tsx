@@ -36,6 +36,7 @@ export interface ItemDetailedProps {
     precaution?: string;
     days?: number;
     status?: boolean;
+    renter_id?: string;
 }
 
 export interface ItemCardProps {

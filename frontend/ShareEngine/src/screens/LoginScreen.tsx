@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                             setUserID(data.user_id.toString());
                         });
                         setLoggedIn(true);
-                        navigation.navigate('HomeStack', { screen: 'Home' });
+                        navigation.navigate('HomeTab', { screen: 'Home' });
                     });
                 } else {
                     console.log('Invalid username or password');
@@ -86,7 +86,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         <View
             style={Styles.container}
         >
-            <Text style = {Styles.title}>
+            <Text style = {[Styles.title, { margin: 20}]}>
                 Login Screen
             </Text>
             <TextInput
@@ -94,6 +94,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 value={username}
                 onChangeText={setUsername}
                 placeholder={'Username'}
+                autoCapitalize={'none'}
             />
             <TextInput
                 style={Styles.input}
@@ -113,6 +114,11 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                     {loggedIn ? 'Logged in as ' + user + ' with token ' + token + ' and user ID ' + userID : 'Not logged in'}
                 </Text>
             </View>
+            <CustomButton
+                style={[Styles.button, { position: 'absolute', bottom: 100}]}
+                title={'To Register'}
+                onPress={() => navigation.navigate('Register')}
+            />
 
             <CustomButton
                 style={[Styles.button, { position: 'absolute', bottom: 20, backgroundColor: 'darkviolet' }]}

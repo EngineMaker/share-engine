@@ -4,6 +4,7 @@ import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
 import { fetchItemDetailsRequest, fetchItemsRequest, fetchUserRequest } from "../Utils";
 import { CustomButton } from "../components/SmallComponents";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 const HomeScreen = ({ navigation }: { navigation: any }) => {
@@ -15,6 +16,13 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         console.log('items:', items);
     }, [items]);
 
+    useFocusEffect(
+        React.useCallback(() => {
+        fetchNewItems();
+          return () => {};
+        }, [])
+      );
+      
     useEffect(() => {
         if (newItems.length > 0) {
             console.log('New items:', newItems);
@@ -34,6 +42,17 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         }
     }, [newItems]);
 
+    const fetchNewItems = async () => {
+        await fetchItemsRequest()
+        .catch((error) => {
+            console.error('Error fetching items:', error);
+        })
+        .then((res) => {
+            console.log('Fetched items:', res);
+            setNewItems(res);
+        });
+    }
+
     const renderItem = ({ item }: { item: ItemProps }) => (
         <ItemCard
             name={item.name}
@@ -51,18 +70,19 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     const handlePress = async (item : ItemProps) => {
         console.log('Pressed item with ID:', item.id);
         console.log('Item:', item);
+        navigation.navigate('Details', { itemObject: item });
         
-        if (item.id !== undefined) {
-            await fetchItemDetailsRequest(item.id).then((res) => {
-                console.log('Fetched item details:', res);
-                return res;
-            }).catch((error) => {
-                console.error('Error fetching item details:', error);
-            }).then((itemDetails) => {
-                navigation.navigate('Details', { itemObject: itemDetails });
-                // console.log('Navigating to Details');
-            });
-        }
+        // if (item.id !== undefined) {
+        //     await fetchItemDetailsRequest(item.id).then((res) => {
+        //         console.log('Fetched item details:', res);
+        //         return res;
+        //     }).catch((error) => {
+        //         console.error('Error fetching item details:', error);
+        //     }).then((itemDetails) => {
+        //         navigation.navigate('Details', { itemObject: itemDetails });
+        //         // console.log('Navigating to Details');
+        //     });
+        // }
             // navigation.navigate('Details', { itemObject: item });
             // navigation.navigate('Details', { itemObject: JSON.stringify(item) });
         };
@@ -104,18 +124,9 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                 <Text>Login</Text>
             </TouchableOpacity>
             <View style={{ position: 'absolute', top: 30, right: 15 }}>
-            <CustomButton
+            {/* <CustomButton
                 title={'debug fetch items'}
-                onPress={async () => {
-                    await fetchItemsRequest()
-                    .catch((error) => {
-                        console.error('Error fetching items:', error);
-                    })
-                    .then((res) => {
-                        console.log('Fetched items:', res);
-                        setNewItems(res);
-                    });
-                }}
+                onPress={fetchNewItems}
             />
             <CustomButton
                 title={'set dummy items'}
@@ -123,7 +134,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     setItems(dummyItems);
                 }
             }
-            />
+            /> */}
             </View>
         </SafeAreaView>
     );

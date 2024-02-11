@@ -9,6 +9,7 @@ import LoginScreen from './screens/LoginScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Image, Text} from 'react-native';
+import RegisterScreen from './screens/RegisterScreen';
 
 const MainStack = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
@@ -27,7 +28,14 @@ const LoginStackScreen = () => (
     <LoginStack.Screen
       name="Login"
       component={LoginScreen}
-      options={{ title: 'Login Screen' }}
+      options={{ title: 'Login Screen',
+      headerShown: false}}
+    />
+    <LoginStack.Screen
+      name="Register"
+      component={RegisterScreen}
+      options={{ title: 'Register Screen',
+      headerShown: false}}
     />
   </LoginStack.Navigator>
 );
@@ -73,7 +81,7 @@ const HomeTabScreen = () => (
         tabBarIcon: ({focused}) => (
           <Image
             source={focused ? selectedPublishIcon : publishIcon}
-            style={{width: 24, height: 24}}
+            style={{width: 36, height: 36, resizeMode: 'stretch'}}
           />
         ),
         tabBarLabel: ({focused}) => (
@@ -104,7 +112,7 @@ function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <MainStack.Navigator initialRouteName="HomeTab">
+        <MainStack.Navigator initialRouteName="LoginStack">
           <MainStack.Screen
             name="LoginStack"
             component={LoginStackScreen}

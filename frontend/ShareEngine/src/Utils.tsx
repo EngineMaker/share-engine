@@ -17,10 +17,27 @@ export const handleLogout = async (navigation: any) => {
 }
 
 export const getUserID = async () => {
-    if (await existsSecureItem('userid')) {
-        return await getSecureItem('userid');
+    if (await existsSecureItem('token')) {
+        const token = await getSecureItem('token');
+        const response = await fetch('http://localhost:8000/api/v1/me', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('User ID fe:', data.user_id);
+            return data.user_id;
+        } else {
+            console.log('Invalid token');
+            return '';
+        }
+    } else {
+        console.log('No token found');
+        return '';
     }
-    return '';
 }
 
 export const setSecureItem = async (key: string, value: string) => {
@@ -82,9 +99,10 @@ const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
 
 export const fetchItemDetailsRequest = async (itemID: string) => {
     try {
-        console.log('Fetching item details');
-        const response = await fetch(itemsUrl + itemID); // for example, http://localhost:8000/api/v1/items/1
-        console.log('Status code:', response.status);
+        console.log('Fetching item details with ID:', itemID);
+        const method = 'GET';
+        const response = await fetcher(itemsUrl + itemID, method);
+        console.log('Status code fetch item details:', response.status);
         const data = await response.json();
         return data;
     } catch (error) {
@@ -95,7 +113,8 @@ export const fetchItemDetailsRequest = async (itemID: string) => {
 export const fetchItemsRequest = async () => {
     try {
         console.log('Fetching items');
-        const response = await fetch(itemsUrl);
+        const method = 'GET';
+        const response = await fetcher(itemsUrl, method);
         console.log('Status code:', response.status);
         const data = await response.json();
         return data;
@@ -120,8 +139,9 @@ export const returnItemRequest = async (itemID: string) => {
     };
     const method = 'POST';
     const response = await fetcher(itemsUrl + 'return', method, body);
-    console.log('Response:', response);
-    return response;
+    const data = await response.json();
+    console.log('returnItemRequest Data:', data);
+    return data;
 }
 
 export const postNewItemRequest = async (item: any) => {
@@ -139,7 +159,30 @@ export const loginRequest = async (username: string, password: string) => {
         "password": password,
     };
     const method = 'POST';
-    const response = await fetcher('http://localhost:8000/api/v1/login', method, body);
+    const response = await fetch('http://localhost:8000/api/v1/login', {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+    });
+    console.log('Response:', response);
+    return response;
+}
+
+export const registerRequest = async (username: string, password: string) => {
+    const body = {
+        "name": username,
+        "password": password,
+    };
+    const method = 'POST';
+    const response = await fetch("http://localhost:8000/api/v1/users/", {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+    });
     console.log('Response:', response);
     return response;
 }
@@ -150,6 +193,7 @@ export const fetcher = async (url: string, method: string, body?: any) => {
         method: method,
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + await getSecureItem('token'),
         },
         body: JSON.stringify(body),
     });

@@ -5,10 +5,12 @@ import { CustomButton } from "../components/SmallComponents";
 import styles from "../Styles";
 import Carousel from "react-native-reanimated-carousel";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { rentItemRequest, returnItemRequest } from "../Utils";
+import { fetchItemDetailsRequest, getUserID, rentItemRequest, returnItemRequest } from "../Utils";
 
 export function DetailsScreen({ route, navigation }: { route: any, navigation: any }) {
     const { itemObject } = route.params;
+    console.log('r:', route.params);
+    console.log('Item:', itemObject);
     const [rentalItem, setRentalItem] = React.useState<ItemDetailedProps>(itemObject ? itemObject : {});
     const screenWidth = Dimensions.get('window').width;
     const [isRentOverlayVisible, setIsRentOverlayVisible] = React.useState(false);
@@ -17,10 +19,36 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
     const photos = rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
     const days = rentalItem.days ? rentalItem.days : 1;
+    const [isRenter, setIsRenter] = React.useState(false);
 
-    // TODO: REMOVE THIS LATER
+    // // TODO: REMOVE THIS LATER
+    // useEffect(() => {
+    //     rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : rentalItem.available;
+    // }, []);
+
     useEffect(() => {
-        rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : rentalItem.available;
+        const fetchData = async () => {
+            const userID = await getUserID();
+            const newIsRenter = rentalItem.renter_id == userID;
+            setIsRenter(newIsRenter);
+            console.log('Renter:', rentalItem.renter_id, 'User:', userID, 'isRenter:', newIsRenter);
+        };
+        fetchData();
+    }, [rentalItem.renter_id]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (itemObject.id !== undefined) {
+                try {
+                    const itemDetails = await fetchItemDetailsRequest(itemObject.id);
+                    console.log('Fetched item details:', itemDetails);
+                    setRentalItem(itemDetails);
+                } catch (error) {
+                    console.error('Error fetching item details:', error);
+                }
+            }
+        };
+        fetchData();
     }, []);
     
     useEffect(() => {
@@ -58,6 +86,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
             if (res.status === 200) {
                 console.log('Rented!:', rentalItem.name);
                 setRentalItem({ ...rentalItem, available: false });
+                setIsRenter(true);
             }
             else if (res.status === 400) {
                 console.log('Item already rented:', rentalItem.name);
@@ -73,12 +102,17 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         console.log('Renting:', rentalItem);
         await returnItemRequest(rentalItem.id)
         .then((res) => {
-            if (res.status === 200) {
+            console.log('Return status:', res);
+            if (res.id) {
                 console.log('Returned!:', rentalItem.name);
-            }
-            else if (res.status === 400) {
-                console.log('Item already returned:', rentalItem.name);
                 setRentalItem({ ...rentalItem, available: true });
+                setIsRenter(false);
+                navigation.goBack();
+            }
+            else {
+                console.log('Item already returned ?:', rentalItem.name);
+                navigation.goBack();
+                // setRentalItem({ ...rentalItem, available: true });
             }
         })
         .catch((error) => {
@@ -95,7 +129,6 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     loop={false}
                     width={screenWidth}
                     height={screenWidth * 0.75}
-                    // autoPlay={true}
                     data={photos ? photos : ['https://via.placeholder.com/150']}
                     scrollAnimationDuration={1000}
                     renderItem={({ item }) => (
@@ -111,30 +144,6 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                         padding: 20,
                     }}
                 >
-                    {/* <CustomButton
-                        title={item.status ? 
-                            '利用可能です' :
-                            '現在借りています'}
-                        style={{ 
-                            width: 178,
-                            height: 40,
-                            borderRadius: 30,
-                            backgroundColor: item.status ? 'green' : 'red',
-                            alignContent: 'center',
-                            justifyContent: 'center',
-                        }}
-                        textStyle={{
-                            fontSize: 20,
-                            color: '#FFFFFF',
-                            fontWeight: 'bold',
-                            shadowColor: 'black',
-                            shadowOffset: { width: 2, height: 2 },
-                            shadowOpacity: 0.5,
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-                        }}
-                        onPress={() => console.log('Renting:', item.name)}
-                    /> */}
                     <Text style={[styles.cardText, {marginVertical: 3}]}
                         >{rentalItem.name}
                     </Text>
@@ -161,11 +170,11 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                         </View>
                     </View>
                     <CustomButton
-                        title={rentalItem.available ? '借りる詳細を決定する' : '現在貸出中です'}
+                        title={rentalItem.available ? '借りる詳細を決定する' : isRenter ? '返却する' : '現在貸出中です'}
                         style={[
                             styles.button,
                             {
-                                backgroundColor: rentalItem.available ? '#70B2FF' : '#909090',
+                                backgroundColor: rentalItem.available ? '#70B2FF' : isRenter ? '#FF7070' : '#CDCDCD',
                                 padding: 10,
                                 borderRadius: 15,
                                 marginTop: 20,
@@ -186,6 +195,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                             console.log('Pressing rent button:', rentalItem);
                             if (rentalItem.available) {
                                 setIsRentOverlayVisible(true);
+                            }
+                            else if (isRenter) {
+                                returnItem();
                             }
                         }}
                     />
