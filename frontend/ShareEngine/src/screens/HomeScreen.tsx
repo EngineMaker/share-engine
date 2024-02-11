@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView } from "react-native";
+import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView, ActivityIndicator } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
 import { fetchItemDetailsRequest, fetchItemsRequest, fetchUserRequest } from "../Utils";

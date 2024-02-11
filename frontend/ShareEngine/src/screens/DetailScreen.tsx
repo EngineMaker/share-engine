@@ -11,20 +11,27 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     const { itemObject } = route.params;
     console.log('r:', route.params);
     console.log('Item:', itemObject);
-    const [rentalItem, setRentalItem] = React.useState<ItemDetailedProps>(itemObject ? itemObject : {});
+    const [rentalItem, setRentalItem] = React.useState<ItemDetailedProps>(itemObject ? itemObject : {
+        id: 0,
+        name: 'Loading...',
+        price: 0,
+        description: 'Loading...',
+        precaution: 'Loading...',
+        owner_id: 0,
+        renter_id: 0,
+        available: false,
+        photos: [],
+        days: 1,
+    });
     const screenWidth = Dimensions.get('window').width;
     const [isRentOverlayVisible, setIsRentOverlayVisible] = React.useState(false);
     const overlayY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
     const overlayOpacity = React.useRef(new Animated.Value(0)).current;
     const daysArray = Array.from({length: 30}, (_, i) => i + 1);
-    const photos = rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean);
-    const days = rentalItem.days ? rentalItem.days : 1;
+    const photos = rentalItem ? rentalItem.photos ? rentalItem.photos : [rentalItem.image_url1, rentalItem.image_url2, rentalItem.image_url3, rentalItem.image_url4].filter(Boolean) : [];
+    const days = rentalItem ? rentalItem.days ? rentalItem.days : 1 : 1;
     const [isRenter, setIsRenter] = React.useState(false);
 
-    // // TODO: REMOVE THIS LATER
-    // useEffect(() => {
-    //     rentalItem.available = rentalItem.status !== undefined ? rentalItem.status : rentalItem.available;
-    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,11 +41,14 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
             console.log('Renter:', rentalItem.renter_id, 'User:', userID, 'isRenter:', newIsRenter);
         };
         fetchData();
-    }, [rentalItem.renter_id]);
+    }, [rentalItem]);
 
     useEffect(() => {
+        // console.log('useEFFECT:', rentalItem);
         const fetchData = async () => {
-            if (itemObject.id !== undefined) {
+            console.log('FFFFetching item details:', itemObject.id);
+                if (itemObject.id !== undefined) {
+                console.log('FEeEEEetching item details:', itemObject.id);
                 try {
                     const itemDetails = await fetchItemDetailsRequest(itemObject.id);
                     console.log('Fetched item details:', itemDetails);
@@ -72,12 +82,12 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         }
     }, [photos]);
 
-    useEffect(() => {
-        if (itemObject && !rentalItem.id) {
-            setRentalItem(itemObject);
-            console.log('Item set:', rentalItem);
-        }
-    }, [itemObject]);
+    // useEffect(() => {
+    //     if (itemObject && !rentalItem.id) {
+    //         setRentalItem(itemObject);
+    //         console.log('Item set:', rentalItem);
+    //     }
+    // }, [itemObject]);
 
     const rentItem = async () => {
         console.log('Renting:', rentalItem);
@@ -145,15 +155,15 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     }}
                 >
                     <Text style={[styles.cardText, {marginVertical: 3}]}
-                        >{rentalItem.name}
+                        >{rentalItem ? rentalItem.name : 'Loading...'}
                     </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>{ rentalItem.price !== undefined ? rentalItem.price > 0 ? '¥' + rentalItem.price + "/日" : 'Free' : 'Price not set' }</Text>
-                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem.owner_id}</Text>
+                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>{ rentalItem ? rentalItem.price !== undefined ? rentalItem.price > 0 ? '¥' + rentalItem.price + "/日" : 'Free' : 'Price not set' : 'Loading...'}</Text>
+                        <Text style={[styles.cardText,{ marginVertical: 1 }]}>👤{rentalItem ? rentalItem.owner_id : "Loading..."}</Text>
                     </View>
-                    <Text
-                        style={[styles.paragraph, { marginVertical: 5 }]}
-                        >{rentalItem.description}</Text>
+                    <Text style={[styles.paragraph, { marginVertical: 5 }]}>
+                        {rentalItem ? rentalItem.description ? rentalItem.description.replace(/\\n/g, '\n') : 'Loading...' : 'Loading...'}
+                    </Text>
                     <View>
                         <Text
                             style={[styles.title, { marginVertical: 5, fontSize: 20 }]}
@@ -166,10 +176,10 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 marginVertical: 5,
                             }}
                         >
-                            <Text>{rentalItem.precaution}</Text>
+                            <Text>{rentalItem ? rentalItem.precaution ? rentalItem.precaution.replace(/\\n/g, '\n') : '特にない' : '特にない'}</Text>
                         </View>
                     </View>
-                    <CustomButton
+                    {rentalItem && <CustomButton
                         title={rentalItem.available ? '借りる詳細を決定する' : isRenter ? '返却する' : '現在貸出中です'}
                         style={[
                             styles.button,
@@ -200,7 +210,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                                 returnItem();
                             }
                         }}
-                    />
+                    />}
                 </View>
                 <CustomButton
                     title="<"

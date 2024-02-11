@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Text, TextInput, View, Image } from 'react-native';
+import { Button, Text, TextInput, View, Image, ActivityIndicator } from 'react-native';
 import Styles from '../Styles';
 import { CustomButton } from '../components/SmallComponents';
 import { existsSecureItem, setSecureItem, removeSecureItem, getSecureItem, loginRequest, getUserID } from '../Utils';
@@ -12,6 +12,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
     const [userID, setUserID] = useState('');
     const [loggedIn, setLoggedIn] = useState(false);
     const [token, setToken] = useState('no token');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const checkLogin = async () => {
@@ -25,6 +26,12 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         };
         checkLogin();
     }, []);
+
+    useEffect(() => {
+        if (isLoading) {
+            console.log('Loading:', isLoading);
+        }
+    }, [isLoading]);
 
     // useEffect(() => {
     //     const checkLogin = async () => {
@@ -46,6 +53,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         // TODO: Call API to authenticate user
         if (username !== '' && password !== '') {
             console.log('Logging in');
+            setIsLoading(true);
             await loginRequest (username, password).then((res) => {
                 console.log('Logged in:', res);
                 if (res.ok) {
@@ -68,7 +76,10 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 }
             }).catch((error) => {
                 console.error('Error logging in:', error);
-            });
+            }).finally(() => {
+                setIsLoading(false);
+            }
+            );
         }
         else {
             console.log('Invalid username or password');
@@ -207,6 +218,30 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                     resizeMode: 'contain'
                 }}
             />
+            {isLoading && <View
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    zIndex: 5,
+                }}
+            >
+                <ActivityIndicator
+                    size="large"
+                    color="white"
+                    animating={true}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                />
+            </View>}
         </View>
     );
 };
