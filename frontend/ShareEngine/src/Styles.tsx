@@ -15,6 +15,16 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         paddingHorizontal: 8,
     },
+    loginInput: {
+        width: "100%",
+        height: 40,
+        borderColor: "gray",
+        borderRadius: 9,
+        borderWidth: 1,
+        backgroundColor: "white",
+        marginBottom: 16,
+        paddingHorizontal: 8,
+    },
     button: {
         width: "100%",
         height: 40,

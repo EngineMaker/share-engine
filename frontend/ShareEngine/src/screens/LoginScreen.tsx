@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View, Image } from 'react-native';
 import Styles from '../Styles';
 import { CustomButton } from '../components/SmallComponents';
 import { existsSecureItem, setSecureItem, removeSecureItem, getSecureItem, loginRequest, getUserID } from '../Utils';
@@ -39,6 +39,9 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
     // }, []);
 
     const handleLogin = async () => {
+        // loadingのアニメーションを表示
+
+
         console.log(username, password);
         // TODO: Call API to authenticate user
         if (username !== '' && password !== '') {
@@ -83,29 +86,40 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
     }
 
     return (
-        <View
-            style={Styles.container}
-        >
-            <Text style = {[Styles.title, { margin: 20}]}>
-                Login Screen
-            </Text>
-            <TextInput
-                style={Styles.input}
-                value={username}
-                onChangeText={setUsername}
-                placeholder={'Username'}
-                autoCapitalize={'none'}
-            />
-            <TextInput
-                style={Styles.input}
-                value={password}
-                onChangeText={setPassword}
-                placeholder={'Password'}
-                secureTextEntry={true}
-            />
+        <View style={{flex: 1}}>
+            <View style={Styles.container}>
+                <View
+                    style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: 400 }}
+                />
+                <View
+                    style={{ width: '80%', alignItems: 'center', justifyContent: 'center', marginTop: 0 }}
+                >
+                    <TextInput
+                        style={Styles.loginInput}
+                        value={username}
+                        onChangeText={setUsername}
+                        placeholder={'Username'}
+                        autoCapitalize={'none'}
+                    />
+                    <TextInput
+                        style={Styles.loginInput}
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder={'Password'}
+                        secureTextEntry={true}
+                    />
+                </View>
             <CustomButton
-                style={Styles.button}
+                style={{ width: 98, minHeight:30, marginTop: 10, backgroundColor: '#D7D7D7', borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}
                 title={'Login'}
+                textStyle={{ 
+                    color: 'black',
+                    fontSize: 20,
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                    textAlignVertical: 'center',
+                    fontWeight: 'bold'
+                }}
                 onPress={handleLogin}
             />
 
@@ -117,21 +131,82 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
             <View
                 style={{ position: 'absolute', bottom: 100, width: '100%', alignItems: 'center' }}
             >
-                <Text>
+                <Text
+                    style={{ color: 'white', fontSize: 20, fontStyle: 'italic', textAlign: 'center', textAlignVertical: 'center' }}
+                >
                     Not registered? Click to register.
                 </Text>
                 <CustomButton
-                    style={[Styles.button, {}]}
-                    title={'To Register'}
+                    style={{ width: 98, minHeight:30, marginTop: 5, borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}
+                    title={'Sign up'}
+                    textStyle={{ 
+                        color: 'blue',
+                        fontSize: 20,
+                        textAlign: 'center',
+                        fontStyle: 'italic',
+                        textAlignVertical: 'center',
+                    }}
                     onPress={() => navigation.navigate('Register')}
                 />
             </View>
+
 
             {/* <CustomButton
                 style={[Styles.button, { position: 'absolute', bottom: 20, backgroundColor: 'darkviolet' }]}
                 title={'Logout'}
                 onPress={handleLogout}
             /> */}
+            </View>
+            <Image
+                source={require('../images/login_screen_image_bg.png')}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: -5,
+                    resizeMode: 'stretch'
+                }}
+            />
+            <Image
+                source={require('../images/login_screen_image_pentagon.png')}
+                style={{
+                    width: '60%',
+                    height: '60%',
+                    position: 'absolute',
+                    alignSelf: 'center',
+                    top: 100,
+                    zIndex: -1,
+                    resizeMode: 'contain'
+                }}
+            />
+            <Image
+                source={require('../images/Share_Engine.png')}
+                style={{
+                    width: '80%',
+                    height: '50%',
+                    position: 'absolute',
+                    alignSelf: 'center',
+                    top: -100,
+                    zIndex: -1,
+                    resizeMode: 'contain'
+                }}
+            />
+            <Image
+                source={require('../images/Sharing_is_Connecting.png')}
+                style={{
+                    width: '70%',
+                    height: '50%',
+                    position: 'absolute',
+                    alignSelf: 'center',
+                    top: -50,
+                    zIndex: -1,
+                    resizeMode: 'contain'
+                }}
+            />
         </View>
     );
 };

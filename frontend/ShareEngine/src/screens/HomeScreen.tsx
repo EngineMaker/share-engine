@@ -25,7 +25,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
       );
       
     useEffect(() => {
-        if (newItems.length > 0) {
+        console.log("getting items");
+        if (newItems?.length > 0) {
             console.log('New items:', newItems);
             // setItems([...items, ...newItems]);
             setItems([

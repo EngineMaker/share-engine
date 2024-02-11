@@ -33,7 +33,7 @@ const ProfileScreen = (navigation: any) => {
     history: [] as ItemProps[],
   };
   const [user, setUser] = React.useState<User>({
-    name: '',
+    name: 'Loading...',
     own_items: [],
     rent_items: [],
     // history: [],
@@ -48,6 +48,7 @@ const ProfileScreen = (navigation: any) => {
   );
 
   const handleGetUser = async () => {
+    console.log('Fetching user');
     const user_id = await tryGetUserID();
     // const user_id = "1";
     console.log('Fetching user with ID:', user_id);
@@ -142,7 +143,7 @@ const ProfileScreen = (navigation: any) => {
           <TouchableOpacity
             onPress={() => handleLogout()}
             style={{ 
-                backgroundColor: 'palered',
+                backgroundColor: 'lightgreen',
                 position: 'absolute',
                 top: 40,
                 right: 15,
