@@ -7,7 +7,7 @@ class ItemCreate(BaseModel):
     description: Optional[str] = None
     precaution: Optional[str]
     group_ids: list[int]
-    # images: list[bytes] = []
+    image_urls: list[str] = []
 
 class ItemResponse(BaseModel):
     id: int

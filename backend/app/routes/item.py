@@ -36,7 +36,7 @@ async def rent_an_item(rent_log: RentLogCreate, db: AsyncSession = Depends(get_s
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/items/return", response_model=RentLogResponse)
-async def return_an_item(rent_log: RentLogCreate, current_user: TokenData = Depends(get_current_user)):
+async def return_an_item(rent_log: RentLogCreate, db: AsyncSession = Depends(get_session), current_user: TokenData = Depends(get_current_user)):
     try:
         user_id = current_user.user_id
         rented_item_log = await return_item(db, rent_log.item_id, user_id)
@@ -48,8 +48,6 @@ async def return_an_item(rent_log: RentLogCreate, current_user: TokenData = Depe
 async def create_new_item(item: ItemCreate, db: AsyncSession = Depends(get_session), current_user: TokenData = Depends(get_current_user)):
     try:
         user_id = current_user.user_id
-        # TODO:画像データの取得 
-        # image_data =
         new_item = await create_item(db=db, user_id=user_id, item_data=item.dict(), images=[])
         return new_item
     except Exception as e:

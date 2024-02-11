@@ -65,12 +65,16 @@ INSERT INTO user_groups (user_id, group_id, is_admin) VALUES (1, 1, TRUE), (2, 2
 -- items テーブルにサンプルデータの挿入
 INSERT INTO items (name, description, image_url1, owner_id, available, price, precaution) VALUES
 ('Item 1', 'Description for Item 1', 'https://placehold.jp/300x200.png', 1, '0', 100, '特になし'),
-('Item 2', 'Description for Item 2', 'https://placehold.jp/300x200.png', 2, '0', 200, '取扱注意');
+('Item 2', 'Description for Item 2', 'https://placehold.jp/300x200.png', 2, '0', 200, '取扱注意'),
+('Item 3', 'Description for Item 2', 'https://placehold.jp/300x200.png', 3, '1', 200, '取扱注意'),
+('Item 4', 'Description for Item 2', 'https://placehold.jp/300x200.png', 3, '1', 200, '取扱注意');
 
 -- group_items テーブルにサンプルデータの挿入
 INSERT INTO group_items (group_id, item_id) VALUES
 (1, 1),
-(2, 2);
+(2, 2),
+(1, 3),
+(1, 4);
 
 -- rent_logs テーブルにサンプルデータの挿入
 INSERT INTO rent_logs (item_id, renter_id, returned, returned_at) VALUES

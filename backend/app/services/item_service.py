@@ -142,18 +142,16 @@ async def return_item(db: AsyncSession, item_id: int, renter_id: int) -> RentLog
 
 
 async def create_item(db: AsyncSession, user_id, item_data: dict, images: List[bytes]) -> ItemModel:
-    # TODO: GCS登録処理
-    # image_urls = await upload_images_to_gcs(images)
-    # image_urlsの長さに応じて、image_url1~5を設定
+
     # new_item = Item(**item_data, **{f"image_url{i+1}": url for i, url in enumerate(image_urls)})
     new_item = ItemModel(
         name=item_data.get('name'), 
         price=item_data.get('price'),
         description=item_data.get('description'),
-        precaution=item_data.get('precaution'),
-        image_url1="https://placehold.jp/300x200.png", 
+        precaution=item_data.get('precaution'), 
         available=True, 
-        owner_id=user_id)
+        owner_id=user_id,
+        **{f"image_url{i+1}": url for i, url in enumerate(item_data.get('image_urls'))})
     db.add(new_item)
     await db.flush()
     for group_id in item_data.get('group_ids'):
