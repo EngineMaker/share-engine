@@ -19,7 +19,7 @@ export const handleLogout = async (navigation: any) => {
 export const getUserID = async () => {
     if (await existsSecureItem('token')) {
         const token = await getSecureItem('token');
-        const response = await fetch('http://localhost:8000/api/v1/me', {
+        const response = await fetch('https://share-engine.click/api/v1/me', {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + token,
@@ -83,7 +83,7 @@ export const existsSecureItem = async (key: string) => {
 
 export const fetchUserRequest = async (user_id: string) => {
     try {
-        const url = 'http://localhost:8000/api/v1/users/' + user_id;
+        const url = 'https://share-engine.click/api/v1/users/' + user_id;
         const response = await fetch(url);
         console.log('Status code:', response.status);
         const data = await response.json();
@@ -93,9 +93,9 @@ export const fetchUserRequest = async (user_id: string) => {
     }
 }
 
-const itemsUrl = 'http://localhost:8000/api/v1/items/'
+const itemsUrl = 'https://share-engine.click/api/v1/items/'
 // const itemsUrl = 'http://34.71.228.117/api/v1/items/'
-const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
+// const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
 
 export const fetchItemDetailsRequest = async (itemID: string) => {
     try {
@@ -159,7 +159,7 @@ export const loginRequest = async (username: string, password: string) => {
         "password": password,
     };
     const method = 'POST';
-    const response = await fetch('http://localhost:8000/api/v1/login', {
+    const response = await fetch('https://share-engine.click/api/v1/login', {
         method: method,
         headers: {
             "Content-Type": "application/json",
@@ -176,7 +176,7 @@ export const registerRequest = async (username: string, password: string) => {
         "password": password,
     };
     const method = 'POST';
-    const response = await fetch("http://localhost:8000/api/v1/users/", {
+    const response = await fetch("https://share-engine.click/api/v1/users/", {
         method: method,
         headers: {
             "Content-Type": "application/json",

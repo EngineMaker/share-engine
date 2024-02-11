@@ -6,11 +6,12 @@ import {
   ScrollView,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import {HorizontalList} from '../components/HorizontalScrollList';
 import {dummyItems} from '../dummyItems';
 import { ItemProps } from '../components/Item';
-import { fetchUserRequest, getUserID, handleLogout } from '../Utils';
+import { fetchUserRequest, getUserID, handleLogout, removeSecureItem } from '../Utils';
 import { CustomButton } from '../components/SmallComponents';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -77,6 +78,15 @@ const ProfileScreen = (navigation: any) => {
     }
   }
   
+  const handleLogout = async () => {
+    console.log('Logging out');
+    await removeSecureItem('userid');
+    await removeSecureItem('token');
+    await removeSecureItem('user');
+    navigation.navigation.navigate('LoginStack', { screen: 'Login' });
+    console.log('User logged out');
+}
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.backgroundImageContainer}>
@@ -129,6 +139,18 @@ const ProfileScreen = (navigation: any) => {
         title={'ユーザ情報を取得'}
         onPress={tryGetUserID}
       /> */}
+          <TouchableOpacity
+            onPress={() => handleLogout()}
+            style={{ 
+                backgroundColor: 'palered',
+                position: 'absolute',
+                top: 40,
+                right: 15,
+                padding: 5, borderRadius: 5,}}
+          >
+            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}
+            >Logout</Text>
+        </TouchableOpacity>
     </SafeAreaView>
   );
 };

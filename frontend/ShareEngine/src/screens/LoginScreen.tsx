@@ -109,22 +109,29 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 onPress={handleLogin}
             />
 
-            <View>
+            {/* <View>
                 <Text>
                     {loggedIn ? 'Logged in as ' + user + ' with token ' + token + ' and user ID ' + userID : 'Not logged in'}
                 </Text>
+            </View> */}
+            <View
+                style={{ position: 'absolute', bottom: 100, width: '100%', alignItems: 'center' }}
+            >
+                <Text>
+                    Not registered? Click to register.
+                </Text>
+                <CustomButton
+                    style={[Styles.button, {}]}
+                    title={'To Register'}
+                    onPress={() => navigation.navigate('Register')}
+                />
             </View>
-            <CustomButton
-                style={[Styles.button, { position: 'absolute', bottom: 100}]}
-                title={'To Register'}
-                onPress={() => navigation.navigate('Register')}
-            />
 
-            <CustomButton
+            {/* <CustomButton
                 style={[Styles.button, { position: 'absolute', bottom: 20, backgroundColor: 'darkviolet' }]}
                 title={'Logout'}
                 onPress={handleLogout}
-            />
+            /> */}
         </View>
     );
 };

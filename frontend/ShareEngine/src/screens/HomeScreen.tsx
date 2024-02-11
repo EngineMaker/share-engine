@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 const HomeScreen = ({ navigation }: { navigation: any }) => {
     const [items, setItems] = React.useState<ItemProps[]>(dummyItems);
     const [newItems, setNewItems] = React.useState<ItemProps[]>([]);
+    const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const numColumns = 2;
 
     useEffect(() => {
@@ -43,6 +44,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     }, [newItems]);
 
     const fetchNewItems = async () => {
+        setIsLoading(true);
         await fetchItemsRequest()
         .catch((error) => {
             console.error('Error fetching items:', error);
@@ -50,17 +52,20 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         .then((res) => {
             console.log('Fetched items:', res);
             setNewItems(res);
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
     }
 
     const renderItem = ({ item }: { item: ItemProps }) => (
         <ItemCard
-            name={item.name}
+            name={isLoading ? 'Loading...' : item.name}
             status={item.status}
-            price={item.price}
+            price={isLoading ? 0 : item.price}
             id={item.id}
             photos={item.photos}
-            owner={item.owner}
+            owner={isLoading ? 'Loading...' : item.owner}
             // onPress={(itemID: string) => handlePress(itemID)}
             onPress={() => handlePress(item)}
             onLongPress={() => handleLongPress(item)}
@@ -112,7 +117,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                 }}
                 style={{ width: "95%" }}
             />
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 onPress={() => navigation.navigate('LoginStack', { screen: 'Login' })}
                 style={{ 
                     backgroundColor: 'red',
@@ -122,9 +127,9 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     padding: 5, borderRadius: 5,}}
             >
                 <Text>Login</Text>
-            </TouchableOpacity>
-            <View style={{ position: 'absolute', top: 30, right: 15 }}>
-            {/* <CustomButton
+            </TouchableOpacity> */}
+            {/* <View style={{ position: 'absolute', top: 30, right: 15 }}>
+            <CustomButton
                 title={'debug fetch items'}
                 onPress={fetchNewItems}
             />
@@ -134,8 +139,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     setItems(dummyItems);
                 }
             }
-            /> */}
-            </View>
+            />
+            </View> */}
         </SafeAreaView>
     );
 }
