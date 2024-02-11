@@ -11,7 +11,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import {NumberInput, CustomButton} from '../components/SmallComponents';
-import {postNewItemRequest} from '../Utils';
+import {postImagesRequest, postNewItemRequest} from '../Utils';
 import {UploadImages} from '../components/UploadImages';
 import Carousel from 'react-native-reanimated-carousel';
 import g_styles from '../Styles';
@@ -26,9 +26,26 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
   const [loanAmount, setLoanAmount] = useState('');
 
   const [imageUris, setImageUris] = useState<string[] | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[] | null>(null);
   const daysArray = Array.from({length: 30}, (_, i) => i + 1);
 
   const saveItem = async () => {
+	let imgUrls: string[] | null = [];
+	  // request img url
+	  if (imageFiles) {
+		const res = await postImagesRequest(imageFiles)
+		if (!res.ok) {
+		  console.log(res.statusText)
+		  console.error('Error posting images:', res);
+		  return 
+		}
+
+		console.log('======res:', res)
+		const data = await res.json();
+		imgUrls = data;
+	  }
+
+
     // 画像
     // アイテム名
     // 説明文
@@ -40,6 +57,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
       price: loanAmount,
       description: description,
       precaution: caution,
+	  image_urls: imgUrls,
       group_ids: ['1'],
     };
     console.log('item:', body);
@@ -59,7 +77,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         <Text style={styles.headerText}>アイテムの編集</Text>
 
         {/* 画像登録エリア */}
-        <UploadImages images={imageUris} setImages={setImageUris} />
+        <UploadImages images={imageUris} setImages={setImageUris} setImageFiles={setImageFiles}/>
 
         {/* アイテム名入力 */}
 

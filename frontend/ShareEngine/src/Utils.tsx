@@ -187,6 +187,55 @@ export const registerRequest = async (username: string, password: string) => {
     return response;
 }
 
+interface UploadFileProps {
+	file: File;
+	filename: string;
+	// headers: any;
+}
+
+export const postImagesRequest = async (files: any) => {
+	console.log('Posting images:');
+
+	let formData = new FormData();
+
+	let uploadFiles: UploadFileProps[] = []
+	const headers = {
+		'accept' : "application/json",
+  		'Content-Type': 'multipart/form-data'
+	};
+
+	for (let i = 0; i < files.length; i++) {
+		const uploadFile: UploadFileProps = {
+			file: files[i],
+			filename: files[i].name,
+		};
+		uploadFiles.push(files[i]);
+		// console.log('uploadFile:', uploadFile);
+		// formData.append('files' + i, files[i]);
+	}
+	formData.append('files', uploadFiles);
+
+	// formData.append('files', uploadFiles);
+
+	
+	// uploadFilesをJSON obj に変換
+	// const body = JSON.stringify(uploadFiles);
+	
+	
+	const options = {
+		method: 'POST',
+		body: formData,
+		headers: headers,
+		"Authorization": "Bearer " + await getSecureItem('token'),
+	};
+
+    const response = await fetch('http://localhost:8000/api/v1/uploadfiles/', options);
+    console.log('Status code:', response.status);
+    console.log('response.json: ', response.json());
+    console.log('response: ', response);
+	
+    return response;
+}
 
 export const fetcher = async (url: string, method: string, body?: any) => {
     const response = await fetch(url, {

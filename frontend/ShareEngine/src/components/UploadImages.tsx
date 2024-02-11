@@ -24,9 +24,11 @@ const SquareImage = ({isMostLeft}: {isMostLeft: boolean}) => {
 export const UploadImages = ({
   images,
   setImages,
+  setImageFiles
 }: {
   images: string[] | null;
   setImages: React.Dispatch<React.SetStateAction<string[] | null>>;
+  setImageFiles: React.Dispatch<React.SetStateAction<File[] | null>>;
 }) => {
   const options = ['写真を撮る', 'フォトライブラリから選択', 'キャンセル'];
 
@@ -84,6 +86,14 @@ export const UploadImages = ({
 
     if (result.assets) {
       const newUris = result.assets.map(asset => asset.uri);
+      const newFiles = result.assets.map(async (asset) => {
+		  const response = await fetch(asset.uri as string);
+		  const blob = await response.blob();
+		  return new File([blob], asset.fileName);
+
+	});
+	const resolvedFiles = await Promise.all(newFiles);	
+	  setImageFiles(resolvedFiles);
       setImages(newUris as string[]);
     }
   };
