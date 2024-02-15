@@ -15,7 +15,8 @@ export interface ItemProps {
     id?: string;
     price?: number;
     photos?: string[];
-    owner: string;
+    owner_id: string;
+    owner?: string;
     description: string;
     precaution?: string;
     days?: number;
@@ -46,6 +47,7 @@ export interface ItemCardProps {
     price?: number;
     photos?: string[];
     owner: string;
+    owner_id: string;
     onPress: (item: ItemProps) => void;
     onLongPress: () => void;
     onEdit: () => void;
@@ -59,6 +61,7 @@ export const ItemCard = ({
     id,
     photos,
     owner,
+    owner_id,
     onPress,
     onLongPress,
 }: ItemCardProps) => {

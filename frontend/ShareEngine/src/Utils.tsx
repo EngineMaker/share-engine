@@ -81,9 +81,9 @@ export const existsSecureItem = async (key: string) => {
     }
 }
 
-export const fetchUserRequest = async (user_id: string) => {
+export const fetchUserDetailsRequest = async (user_id: string) => {
     try {
-        const url = 'https://share-engine.click/api/v1/users/' + user_id;
+        const url = usersUrl + "/" + user_id;
         const response = await fetch(url);
         console.log('Status code:', response.status);
         const data = await response.json();
@@ -93,6 +93,19 @@ export const fetchUserRequest = async (user_id: string) => {
     }
 }
 
+export const fetchUsersRequest = async () => {
+    try {
+        console.log('Fetching users');
+        const method = 'GET';
+        const response = await fetcher(usersUrl, method);
+        console.log('Status code:', response.status);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching items:', error);
+    }
+}
+const usersUrl = 'https://share-engine.click/api/v1/users'
 const itemsUrl = 'https://share-engine.click/api/v1/items/'
 // const itemsUrl = 'http://34.71.228.117/api/v1/items/'
 // const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
