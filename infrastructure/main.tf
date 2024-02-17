@@ -194,58 +194,53 @@ resource "google_sql_database" "database" {
 }
 
 # backend api
-# resource "google_cloud_run_v2_service" "backend_api" {
-#   name     = "backend-api"
-#   location = var.region
-#   ingress = "INGRESS_TRAFFIC_ALL"
-# 
-#   template {
-#     scaling {
-#       max_instance_count = 1
-# 			min_instance_count = 0
-#     }
-# 
-#     volumes {
-#       name = "cloudsql"
-#       cloud_sql_instance {
-#         instances = [google_sql_database_instance.instance.connection_name]
-#       }
-#     }
-# 
-#     containers {
-#       image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.backend.name}/backend-api:lastest"
-#       ports {
-#         container_port = 80
-#       }
-#       env {
-#         name = "DATABASE_URL"
-#         value_source {
-#           secret_key_ref {
-#             secret  = google_secret_manager_secret.db_conn.secret_id
-#             version = "latest"
-#           }
-#         }
-#       }
-#     }
-#   }
-# 
-#   traffic {
-#     type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
-#     percent = 100
-#   }
-#   lifecycle {
-#     ignore_changes = [
-#       traffic,
-#       template,
-#       client
-#     ]
-#   }
-#   depends_on = [
-#     google_project_service.cloudrun,
-#     google_artifact_registry_repository.backend,
-#     google_secret_manager_secret_version.db_conn,
-#   ]
-# }
+resource "google_cloud_run_v2_service" "backend_api" {
+  name     = "backend-api"
+  location = var.region
+  ingress = "INGRESS_TRAFFIC_ALL"
+  launch_stage = "BETA"
+
+  template {
+    scaling {
+      max_instance_count = 1
+      min_instance_count = 0
+    }
+    vpc_access {
+      network_interfaces {
+        network = google_compute_network.default.id
+        tags = ["web"]
+      }
+      egress = "ALL_TRAFFIC"
+    }
+    service_account = google_service_account.cloudrun_sa.email
+
+    containers {
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.backend.name}/backend-api:lastest"
+      ports {
+        container_port = 80
+      }
+      env {
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.db_conn.secret_id
+            version = "latest"
+          }
+        }
+      }
+    }
+  }
+
+  traffic {
+    type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    percent = 100
+  }
+  depends_on = [
+    google_project_service.cloudrun,
+    google_artifact_registry_repository.backend,
+    google_secret_manager_secret_version.db_conn,
+  ]
+}
 
  data "google_iam_policy" "noauth" {
    binding {
@@ -254,13 +249,28 @@ resource "google_sql_database" "database" {
    }
  }
 
- # resource "google_cloud_run_service_iam_policy" "noauth" {
- #    location    = google_cloud_run_v2_service.backend_api.location
- #    project     = google_cloud_run_v2_service.backend_api.project
- #    service     = google_cloud_run_v2_service.backend_api.name
- # 
- #    policy_data = data.google_iam_policy.noauth.policy_data
- # } 
+ resource "google_cloud_run_service_iam_policy" "noauth" {
+    location    = google_cloud_run_v2_service.backend_api.location
+    project     = google_cloud_run_v2_service.backend_api.project
+    service     = google_cloud_run_v2_service.backend_api.name
+ 
+    policy_data = data.google_iam_policy.noauth.policy_data
+ } 
+
+resource "google_artifact_registry_repository_iam_member" "pull" {
+  project = google_artifact_registry_repository.backend.project
+  location = google_artifact_registry_repository.backend.location
+  repository = google_artifact_registry_repository.backend.name
+  role = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "secret" {
+  project = google_secret_manager_secret.db_conn.project
+  secret_id = google_secret_manager_secret.db_conn.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
 
 resource "google_secret_manager_secret" "db_conn" {
   secret_id = "db-conn"
