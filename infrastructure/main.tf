@@ -9,7 +9,7 @@ resource "google_compute_global_address" "cdn_ip" {
 
 # Loadbalancer
 # url map
-resource "google_compute_url_map" "http_lb" {
+resource "google_compute_url_map" "map" {
   name = "http-lb"
   default_service = google_compute_backend_service.group.id
    host_rule {
@@ -46,19 +46,19 @@ resource "google_compute_backend_bucket" "default" {
   }
 }
 
-resource "google_compute_health_check" "default" {
-  name               = "http-basic-check"
-  check_interval_sec = 5
-  healthy_threshold  = 2
-  http_health_check {
-    port               = 80
-    port_specification = "USE_FIXED_PORT"
-    proxy_header       = "NONE"
-    request_path       = "/"
-  }
-  timeout_sec         = 5
-  unhealthy_threshold = 2
-}
+# resource "google_compute_health_check" "default" {
+#   name               = "http-basic-check"
+#   check_interval_sec = 5
+#   healthy_threshold  = 2
+#   http_health_check {
+#     port               = 80
+#     port_specification = "USE_FIXED_PORT"
+#     proxy_header       = "NONE"
+#     request_path       = "/"
+#   }
+#   timeout_sec         = 5
+#   unhealthy_threshold = 2
+# }
 
 resource "google_compute_backend_service" "group" {
   name      = "group"
@@ -66,16 +66,18 @@ resource "google_compute_backend_service" "group" {
   protocol  = "HTTP"
 
   backend {
-    group = google_compute_instance_group.group.id
+    #group = google_compute_instance_group.group.id
+    group = google_compute_region_network_endpoint_group.serverless_neg.id
   }
 
-  health_checks = [
-    google_compute_health_check.default.id,
-  ]
+  # health_checks = [
+  #   google_compute_health_check.default.id,
+  # ]
+  load_balancing_scheme = "EXTERNAL_MANAGED"
 }
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
-  provider              = google-beta
+  #provider              = google-beta
   name                  = "serverless-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
@@ -86,7 +88,7 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
 
 resource "google_compute_target_https_proxy" "https_proxy" {
   name             = "https-lb-proxy"
-  url_map          = google_compute_url_map.http_lb.id
+  url_map          = google_compute_url_map.map.id
   ssl_certificates = [google_compute_managed_ssl_certificate.ssl.id]
 }
 
@@ -94,7 +96,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
 resource "google_compute_global_forwarding_rule" "forwarding" {
   name = "http-lb-forwarding-rule"
   ip_protocol = "TCP"
-  load_balancing_scheme = "EXTERNAL"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
   port_range = "443"
   target = google_compute_target_https_proxy.https_proxy.id
   ip_address = google_compute_global_address.cdn_ip.id
@@ -197,19 +199,21 @@ resource "google_cloud_run_v2_service" "backend_api" {
   name     = "backend-api"
   location = var.region
   ingress = "INGRESS_TRAFFIC_ALL"
+  launch_stage = "BETA"
 
   template {
     scaling {
       max_instance_count = 1
-			min_instance_count = 0
+      min_instance_count = 0
     }
-
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [google_sql_database_instance.instance.connection_name]
+    vpc_access {
+      network_interfaces {
+        network = google_compute_network.default.id
+        tags = ["web"]
       }
+      egress = "ALL_TRAFFIC"
     }
+    service_account = google_service_account.cloudrun_sa.email
 
     containers {
       image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.backend.name}/backend-api:lastest"
@@ -232,13 +236,6 @@ resource "google_cloud_run_v2_service" "backend_api" {
     type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
     percent = 100
   }
-  lifecycle {
-    ignore_changes = [
-      traffic,
-      template,
-      client
-    ]
-  }
   depends_on = [
     google_project_service.cloudrun,
     google_artifact_registry_repository.backend,
@@ -253,13 +250,28 @@ resource "google_cloud_run_v2_service" "backend_api" {
    }
  }
 
-resource "google_cloud_run_service_iam_policy" "noauth" {
-   location    = google_cloud_run_v2_service.backend_api.location
-   project     = google_cloud_run_v2_service.backend_api.project
-   service     = google_cloud_run_v2_service.backend_api.name
+ resource "google_cloud_run_service_iam_policy" "noauth" {
+    location    = google_cloud_run_v2_service.backend_api.location
+    project     = google_cloud_run_v2_service.backend_api.project
+    service     = google_cloud_run_v2_service.backend_api.name
+ 
+    policy_data = data.google_iam_policy.noauth.policy_data
+ } 
 
-   policy_data = data.google_iam_policy.noauth.policy_data
-} 
+resource "google_artifact_registry_repository_iam_member" "pull" {
+  project = google_artifact_registry_repository.backend.project
+  location = google_artifact_registry_repository.backend.location
+  repository = google_artifact_registry_repository.backend.name
+  role = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "secret" {
+  project = google_secret_manager_secret.db_conn.project
+  secret_id = google_secret_manager_secret.db_conn.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
 
 resource "google_secret_manager_secret" "db_conn" {
   secret_id = "db-conn"
