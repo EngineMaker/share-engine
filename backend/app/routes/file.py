@@ -7,6 +7,7 @@ router = APIRouter()
 async def create_upload_files(files: list[UploadFile]):
     urls = []
     for file in files:
+        print('file :', file)
         contents = await file.read()
         file_name = f"/app/tmp/{file.filename}"
         with open(file_name, "wb") as f:

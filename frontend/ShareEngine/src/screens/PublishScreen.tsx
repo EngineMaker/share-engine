@@ -30,21 +30,19 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
   const daysArray = Array.from({length: 30}, (_, i) => i + 1);
 
   const saveItem = async () => {
-	let imgUrls: string[] | null = [];
-	  // request img url
-	  if (imageFiles) {
-		const res = await postImagesRequest(imageFiles)
-		if (!res.ok) {
-		  console.log(res.statusText)
-		  console.error('Error posting images:', res);
-		  return 
-		}
+    let imgUrls: string[] | null = [];
+    // request img url
+    if (imageFiles) {
+      const res = await postImagesRequest(imageFiles);
+      if (!res.ok) {
+        console.log(res.statusText);
+        console.error('Error posting images:', res);
+        return;
+      }
 
-		console.log('======res:', res)
-		const data = await res.json();
-		imgUrls = data;
-	  }
-
+      const data = await res.json();
+      imgUrls = data;
+    }
 
     // 画像
     // アイテム名
@@ -57,7 +55,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
       price: loanAmount,
       description: description,
       precaution: caution,
-	  image_urls: imgUrls,
+      image_urls: imgUrls,
       group_ids: ['1'],
     };
     console.log('item:', body);
@@ -77,7 +75,11 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
         <Text style={styles.headerText}>アイテムの編集</Text>
 
         {/* 画像登録エリア */}
-        <UploadImages images={imageUris} setImages={setImageUris} setImageFiles={setImageFiles}/>
+        <UploadImages
+          images={imageUris}
+          setImages={setImageUris}
+          setImageFiles={setImageFiles}
+        />
 
         {/* アイテム名入力 */}
 

@@ -24,7 +24,7 @@ const SquareImage = ({isMostLeft}: {isMostLeft: boolean}) => {
 export const UploadImages = ({
   images,
   setImages,
-  setImageFiles
+  setImageFiles,
 }: {
   images: string[] | null;
   setImages: React.Dispatch<React.SetStateAction<string[] | null>>;
@@ -86,14 +86,17 @@ export const UploadImages = ({
 
     if (result.assets) {
       const newUris = result.assets.map(asset => asset.uri);
-      const newFiles = result.assets.map(async (asset) => {
-		  const response = await fetch(asset.uri as string);
-		  const blob = await response.blob();
-		  return new File([blob], asset.fileName);
+      const newFiles = result.assets.map(async asset => {
+        console.log('asset.uri: ', asset.uri);
+        const response = await fetch(asset.uri as string);
+        return new File([await response.blob()], asset.fileName, {
+          type: 'image/png',
+          lastModified: new Date().getTime(),
+        });
+      });
 
-	});
-	const resolvedFiles = await Promise.all(newFiles);	
-	  setImageFiles(resolvedFiles);
+      const resolvedFiles = await Promise.all(newFiles);
+      setImageFiles(resolvedFiles);
       setImages(newUris as string[]);
     }
   };
