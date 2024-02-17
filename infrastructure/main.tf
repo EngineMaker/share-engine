@@ -46,19 +46,19 @@ resource "google_compute_backend_bucket" "default" {
   }
 }
 
-resource "google_compute_health_check" "default" {
-  name               = "http-basic-check"
-  check_interval_sec = 5
-  healthy_threshold  = 2
-  http_health_check {
-    port               = 80
-    port_specification = "USE_FIXED_PORT"
-    proxy_header       = "NONE"
-    request_path       = "/"
-  }
-  timeout_sec         = 5
-  unhealthy_threshold = 2
-}
+# resource "google_compute_health_check" "default" {
+#   name               = "http-basic-check"
+#   check_interval_sec = 5
+#   healthy_threshold  = 2
+#   http_health_check {
+#     port               = 80
+#     port_specification = "USE_FIXED_PORT"
+#     proxy_header       = "NONE"
+#     request_path       = "/"
+#   }
+#   timeout_sec         = 5
+#   unhealthy_threshold = 2
+# }
 
 resource "google_compute_backend_service" "group" {
   name      = "group"
@@ -66,24 +66,25 @@ resource "google_compute_backend_service" "group" {
   protocol  = "HTTP"
 
   backend {
-    group = google_compute_instance_group.group.id
+    #group = google_compute_instance_group.group.id
+    group = google_compute_region_network_endpoint_group.serverless_neg.id
   }
 
-  health_checks = [
-    google_compute_health_check.default.id,
-  ]
+  # health_checks = [
+  #   google_compute_health_check.default.id,
+  # ]
   load_balancing_scheme = "EXTERNAL_MANAGED"
 }
 
-# resource "google_compute_region_network_endpoint_group" "serverless_neg" {
-#   provider              = google-beta
-#   name                  = "serverless-neg"
-#   network_endpoint_type = "SERVERLESS"
-#   region                = var.region
-#   cloud_run {
-#     service = google_cloud_run_v2_service.backend_api.name
-#   }
-# }
+resource "google_compute_region_network_endpoint_group" "serverless_neg" {
+  #provider              = google-beta
+  name                  = "serverless-neg"
+  network_endpoint_type = "SERVERLESS"
+  region                = var.region
+  cloud_run {
+    service = google_cloud_run_v2_service.backend_api.name
+  }
+}
 
 resource "google_compute_target_https_proxy" "https_proxy" {
   name             = "https-lb-proxy"
