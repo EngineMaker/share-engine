@@ -76,7 +76,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     }
 
     const findUserName = (id: string) => {
-        const user = users.find(user => user.id === id);
+        const user = users ? users.find((user) => user.id === id) : undefined;
         return user ? user.name : 'unknown';
     }
 
