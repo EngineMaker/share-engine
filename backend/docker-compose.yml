@@ -6,6 +6,7 @@ services:
       - ./app:/app/app:cached
       - ./scripts:/app/scripts:cached
       - ./credential.json:/app/credential.json:cached
+      - ./out:/app/out
     ports:
       - "8000:80"
     environment:
