@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import Config from "react-native-config";
 import RNSecureStorage, {ACCESSIBLE} from 'rn-secure-storage';
+
+const apiBase = Config.API_BASE;
 
 export const handleLogout = async (navigation: any) => {
     console.log('Logging out');
@@ -19,7 +22,7 @@ export const handleLogout = async (navigation: any) => {
 export const getUserID = async () => {
     if (await existsSecureItem('token')) {
         const token = await getSecureItem('token');
-        const response = await fetch('https://share-engine.click/api/v1/me', {
+        const response = await fetch(`${apiBase}/me`, {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + token,
@@ -105,8 +108,8 @@ export const fetchUsersRequest = async () => {
         console.error('Error fetching items:', error);
     }
 }
-const usersUrl = 'https://share-engine.click/api/v1/users'
-const itemsUrl = 'https://share-engine.click/api/v1/items/'
+const usersUrl = `${apiBase}/users`
+const itemsUrl = `${apiBase}/items/`
 // const itemsUrl = 'http://34.71.228.117/api/v1/items/'
 // const itemDetailsUrl = 'http://localhost:8000/api/v1/items/'
 
@@ -172,7 +175,7 @@ export const loginRequest = async (username: string, password: string) => {
         "password": password,
     };
     const method = 'POST';
-    const response = await fetch('https://share-engine.click/api/v1/login', {
+    const response = await fetch(`${apiBase}/login`, {
         method: method,
         headers: {
             "Content-Type": "application/json",
@@ -189,7 +192,7 @@ export const registerRequest = async (username: string, password: string) => {
         "password": password,
     };
     const method = 'POST';
-    const response = await fetch("https://share-engine.click/api/v1/users/", {
+    const response = await fetch(`${apiBase}/users/`, {
         method: method,
         headers: {
             "Content-Type": "application/json",
