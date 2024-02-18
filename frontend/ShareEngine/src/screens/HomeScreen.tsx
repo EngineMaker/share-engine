@@ -2,15 +2,21 @@ import React, { useEffect } from "react";
 import { View, Text, Button, Touchable, TouchableOpacity, ScrollView, FlatList, SafeAreaView, ActivityIndicator } from "react-native";
 import { ItemCard, ItemCardProps, ItemProps } from "../components/Item";
 import { dummyItems } from "../dummyItems";
-import { fetchItemDetailsRequest, fetchItemsRequest, fetchUserRequest } from "../Utils";
+import { fetchItemDetailsRequest, fetchItemsRequest, fetchUserDetailsRequest, fetchUsersRequest } from "../Utils";
 import { CustomButton } from "../components/SmallComponents";
 import { useFocusEffect } from "@react-navigation/native";
+
+export interface UserSimple {
+    id: string;
+    name: string;
+}
 
 
 const HomeScreen = ({ navigation }: { navigation: any }) => {
     const [items, setItems] = React.useState<ItemProps[]>(dummyItems);
     const [newItems, setNewItems] = React.useState<ItemProps[]>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
+    const [users, setUsers] = React.useState<UserSimple[]>([]);
     const numColumns = 2;
 
     useEffect(() => {
@@ -19,6 +25,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
 
     useFocusEffect(
         React.useCallback(() => {
+        fetchUsers();
         fetchNewItems();
           return () => {};
         }, [])
@@ -36,13 +43,22 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
                     price: item.price,
                     id: item.id,
                     photos: [item.image_url1, item.image_url2, item.image_url3, item.image_url4].filter(Boolean),
-                    owner: item.owner_id ? item.owner_id : 'unknown',
+                    owner_id: item.owner_id ? item.owner_id : 'unknown',
                     renter: item.renter_id ? item.renter_id : '',
                     description: item.description,
                 }))
             ]);
         }
     }, [newItems]);
+
+    const fetchUsers = async () => {
+        await fetchUsersRequest().then((res) => {
+            console.log('Fetched users info:', res);
+            setUsers(res);
+        }).catch((error) => {
+            console.error('Error fetching users info:', error);
+        });
+    }
 
     const fetchNewItems = async () => {
         setIsLoading(true);
@@ -59,6 +75,11 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         });
     }
 
+    const findUserName = (id: string) => {
+        const user = users ? users.find((user) => user.id === id) : undefined;
+        return user ? user.name : 'unknown';
+    }
+
     const renderItem = ({ item }: { item: ItemProps }) => (
         <ItemCard
             name={isLoading ? 'Loading...' : item.name}
@@ -66,7 +87,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             price={isLoading ? 0 : item.price}
             id={item.id}
             photos={item.photos}
-            owner={isLoading ? 'Loading...' : item.owner}
+            owner={isLoading ? 'Loading...' : findUserName(item.owner_id)}
+            owner_id={item.owner_id}
             // onPress={(itemID: string) => handlePress(itemID)}
             onPress={() => handlePress(item)}
             onLongPress={() => handleLongPress(item)}
