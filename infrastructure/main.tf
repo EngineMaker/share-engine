@@ -46,6 +46,7 @@ resource "google_compute_backend_bucket" "default" {
   }
 }
 
+# 障害時に切り替える様
 # resource "google_compute_health_check" "default" {
 #   name               = "http-basic-check"
 #   check_interval_sec = 5
@@ -66,7 +67,7 @@ resource "google_compute_backend_service" "group" {
   protocol  = "HTTP"
 
   backend {
-    #group = google_compute_instance_group.group.id
+    # group = google_compute_instance_group.group.id
     group = google_compute_region_network_endpoint_group.serverless_neg.id
   }
 
@@ -211,14 +212,24 @@ resource "google_cloud_run_v2_service" "backend_api" {
         network = google_compute_network.default.id
         tags = ["web"]
       }
-      egress = "ALL_TRAFFIC"
+      egress = "PRIVATE_RANGES_ONLY"
+      #egress = "ALL_TRAFFIC"
     }
     service_account = google_service_account.cloudrun_sa.email
+    timeout = "10s"
 
     containers {
       image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.backend.name}/backend-api:lastest"
       ports {
         container_port = 80
+      }
+      env {
+        name = "JWT_SECRET_KEY"
+        value = "CompaniesOverCountries"
+      }
+      env {
+        name = "HASH_ALGORITHM"
+        value = "HS256"
       }
       env {
         name = "DATABASE_URL"
@@ -243,26 +254,33 @@ resource "google_cloud_run_v2_service" "backend_api" {
   ]
 }
 
- data "google_iam_policy" "noauth" {
+data "google_iam_policy" "noauth" {
    binding {
      role = "roles/run.invoker"
      members = ["allUsers"]
    }
- }
+}
 
- resource "google_cloud_run_service_iam_policy" "noauth" {
+resource "google_cloud_run_service_iam_policy" "noauth" {
     location    = google_cloud_run_v2_service.backend_api.location
     project     = google_cloud_run_v2_service.backend_api.project
     service     = google_cloud_run_v2_service.backend_api.name
  
     policy_data = data.google_iam_policy.noauth.policy_data
- } 
+} 
 
 resource "google_artifact_registry_repository_iam_member" "pull" {
   project = google_artifact_registry_repository.backend.project
   location = google_artifact_registry_repository.backend.location
   repository = google_artifact_registry_repository.backend.name
   role = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
+
+# TODO: 検証が必要
+resource "google_project_iam_member" "cloudrun_service_account_act_as" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
   member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
 }
 
@@ -292,6 +310,7 @@ resource "google_service_account" "cloudrun_sa" {
   account_id = "cloudrun-sa"
 }
 
+# todo 後ほど削除必須
 resource "google_service_account" "gcs_sa" {
   account_id = "gcs-sa"
 }
@@ -303,13 +322,26 @@ resource "google_service_account_key" "service_account" {
 
 resource "local_file" "service_account" {
     content  = base64decode(google_service_account_key.service_account.private_key)
-    filename = "credentials.json"
+    filename = "credential.json"
 }
 
+# gcsにfileをアップロードする権限
 resource "google_storage_bucket_iam_member" "gcs" {
   bucket = google_storage_bucket.default.name
-  role = "roles/storage.objectCreator"
-  member = "serviceAccount:${google_service_account.gcs_sa.email}"
+  role = "roles/storage.objectUser"
+  member = "serviceAccount:${google_service_account.cloudrun_sa.email}"
+}
+
+resource "google_storage_bucket_iam_member" "gcs_group" {
+  bucket = google_storage_bucket.default.name
+  role = "roles/storage.objectUser"
+  member = "group:qiita-hackathon@yuki-sato.xyz"
+}
+
+resource "google_project_iam_member" "viewr_group" {
+  project = var.project_id
+  role    = "roles/viewer"
+  member = "group:qiita-hackathon@yuki-sato.xyz"
 }
 
 resource "random_id" "bucket_prefix" {
