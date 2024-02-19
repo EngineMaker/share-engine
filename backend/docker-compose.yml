@@ -5,7 +5,7 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./scripts:/app/scripts:cached
-      - ./credential.json:/app/credential.json:cached
+      - ~/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json:cached
       - ./out:/app/out
     ports:
       - "8000:80"

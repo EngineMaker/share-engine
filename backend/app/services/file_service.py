@@ -1,13 +1,11 @@
 from google.cloud import storage
-from google.oauth2 import service_account
+import google.auth
 
 # GCSへのアップロード関数
 def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
     # 認証情報を設定
-    credentials = service_account.Credentials.from_service_account_file(
-        "/app/credential.json"
-    )
-    storage_client = storage.Client(credentials=credentials)
+    credentials, project = google.auth.default()
+    storage_client = storage.Client(project=project, credentials=credentials)
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
