@@ -1,0 +1,94 @@
+@baseUrl = http://localhost:8000/api/v1
+
+### 管理者でログイン
+
+# @name login_admin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "tokisaba",
+  "password": "tokisaba"
+}
+
+###
+
+@token_admin = {{login_admin.response.body.access_token}}
+
+### 一般ユーザーでログイン
+
+# @name login_general
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "mktoho",
+  "password": "password"
+}
+
+###
+
+@token_general = {{login_general.response.body.access_token}}
+
+
+#
+# ユーザー
+#
+
+### ユーザー一覧
+
+GET {{baseUrl}}/users
+Authorization: Bearer {{token_admin}}
+
+### ユーザー詳細
+
+GET {{baseUrl}}/users/5
+Authorization: Bearer {{token_admin}}
+
+### Y/貴方自身
+
+GET {{baseUrl}}/me
+Authorization: Bearer {{token_general}}
+
+### ユーザー登録
+
+POST {{baseUrl}}/users/
+Content-Type: application/json
+
+{
+  "name": "mktoho",
+  "password": "password"
+}
+
+
+#
+# モノ
+#
+
+### モノ一覧
+
+GET {{baseUrl}}/items
+Authorization: Bearer {{token_admin}}
+
+### モノ詳細
+
+GET {{baseUrl}}/items/3
+Authorization: Bearer {{token_admin}}
+
+### モノを借りる
+
+POST {{baseUrl}}/items/rent
+Authorization: Bearer {{token_general}}
+
+{
+  "item_id": 3
+}
+
+### 借りたモノを返す
+
+POST {{baseUrl}}/items/return
+Authorization: Bearer {{token_general}}
+
+{
+  "item_id": 3
+}
