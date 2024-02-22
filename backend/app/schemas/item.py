@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class ItemCreate(BaseModel):
     name: str
     price: Optional[int] = 0
@@ -8,6 +9,7 @@ class ItemCreate(BaseModel):
     precaution: Optional[str]
     group_ids: list[int]
     image_urls: list[str] = []
+
 
 class ItemResponse(BaseModel):
     id: int
@@ -25,6 +27,7 @@ class ItemResponse(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ItemList(BaseModel):
     id: int
     name: str
@@ -35,6 +38,7 @@ class ItemList(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class ItemDetail(ItemList):
     description: Optional[str] = None

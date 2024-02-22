@@ -30,7 +30,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
           return () => {};
         }, [])
       );
-      
+
     useEffect(() => {
         console.log("getting items");
         if (newItems?.length > 0) {
@@ -99,7 +99,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         console.log('Pressed item with ID:', item.id);
         console.log('Item:', item);
         navigation.navigate('Details', { itemObject: item });
-        
+
         // if (item.id !== undefined) {
         //     await fetchItemDetailsRequest(item.id).then((res) => {
         //         console.log('Fetched item details:', res);
@@ -128,7 +128,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     };
 
     return (
-        <SafeAreaView 
+        <SafeAreaView
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <FlatList
                 data={items}
@@ -142,7 +142,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             />
             {/* <TouchableOpacity
                 onPress={() => navigation.navigate('LoginStack', { screen: 'Login' })}
-                style={{ 
+                style={{
                     backgroundColor: 'red',
                     position: 'absolute',
                     top: 40,

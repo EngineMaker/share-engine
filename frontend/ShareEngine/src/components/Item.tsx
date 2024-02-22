@@ -69,7 +69,7 @@ export const ItemCard = ({
         <TouchableOpacity
             onPress={() => onPress({ name, status, price, id, photos } as ItemProps)}
             onLongPress={onLongPress}
-            style={{ 
+            style={{
                 width: itemWidth,
                 height: itemWidth * 1.5,
                 backgroundColor: 'lightgray',
@@ -92,7 +92,7 @@ export const ItemCard = ({
                     source={photos ? { uri: photos[0] } : require(placeholder)}
                 />
                 <View style={{ position: 'absolute', backgroundColor: status ? 'transparent' : 'rgba(0, 0, 0, 0.5)', width: "100%", height: "100%" }} />
-                {status ? null : 
+                {status ? null :
                     <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>貸出中</Text>
                     </View>

@@ -10,10 +10,11 @@ from sqlalchemy import update
 from fastapi import HTTPException
 from datetime import datetime
 
+
 async def get_items_for_user_groups(db: AsyncSession, user_id: int):
     # ユーザーが所属するグループのIDを取得
     usr_group_ids = await get_groups(db, user_id)
-    
+
     # これらのグループに属するアイテムを取得
     result = await db.execute(
         select(ItemModel)
@@ -44,10 +45,11 @@ async def get_items_for_user_groups(db: AsyncSession, user_id: int):
     #         for key, value in group.__dict__.items():
     #             if not key.startswith('_'):
     #                 print(f'{key}: {value}')
-    #     print('==========') 
+    #     print('==========')
     # print('===========================================================')
 
     return return_items
+
 
 async def get_item_detail(db: AsyncSession, item_id: int, user_id: int):
     # ユーザーが所属するグループのIDを取得
@@ -70,8 +72,7 @@ async def get_item_detail(db: AsyncSession, item_id: int, user_id: int):
     # renterを探す
     if not item.available:
         rent_log_result = await db.execute(
-            select(RentLog)
-            .where(RentLog.item_id == item_id, RentLog.returned == False)
+            select(RentLog).where(RentLog.item_id == item_id, RentLog.returned is False)
         )
         rent_log = rent_log_result.scalars().first()
 
@@ -103,16 +104,20 @@ async def rent_item(db: AsyncSession, item_id: int, renter_id: int) -> RentLog:
 
     if not item.available:
         raise Exception("Item is not available")
-    
+
     # Update item availability
-    await db.execute(update(ItemModel).where(ItemModel.id == item_id).values(available=False))
-    
+    await db.execute(
+        update(ItemModel).where(ItemModel.id == item_id).values(available=False)
+    )
+
     # Create rent log
-    rent_log = RentLog(item_id=item_id, renter_id=renter_id, returned=False, returned_at=None)
+    rent_log = RentLog(
+        item_id=item_id, renter_id=renter_id, returned=False, returned_at=None
+    )
     db.add(rent_log)
     await db.commit()
     await db.refresh(rent_log)
-    
+
     return rent_log
 
 
@@ -125,46 +130,61 @@ async def return_item(db: AsyncSession, item_id: int, renter_id: int) -> RentLog
 
     if item.available:
         raise Exception("Item is already returned")
-    
+
     # Update item availability
-    await db.execute(update(ItemModel).where(ItemModel.id == item_id).values(available=True))
-    
+    await db.execute(
+        update(ItemModel).where(ItemModel.id == item_id).values(available=True)
+    )
+
     # Update rent log
-    rent_log = await db.execute(select(RentLog).filter(RentLog.item_id == item_id, RentLog.renter_id == renter_id, RentLog.returned == False))
+    rent_log = await db.execute(
+        select(RentLog).filter(
+            RentLog.item_id == item_id,
+            RentLog.renter_id == renter_id,
+            RentLog.returned is False,
+        )
+    )
     rent_log = rent_log.scalars().first()
     if not item:
         raise HTTPException(status_code=404, detail="Rental Log not found")
-    await db.execute(update(RentLog).where(RentLog.item_id == item_id, RentLog.renter_id == renter_id, RentLog.returned == False).values(returned=True, returned_at=datetime.now()))
+    await db.execute(
+        update(RentLog)
+        .where(
+            RentLog.item_id == item_id,
+            RentLog.renter_id == renter_id,
+            RentLog.returned is False,
+        )
+        .values(returned=True, returned_at=datetime.now())
+    )
     await db.commit()
     await db.refresh(rent_log)
-    
+
     return rent_log
 
 
-async def create_item(db: AsyncSession, user_id, item_data: dict, images: List[bytes]) -> ItemModel:
-
+async def create_item(
+    db: AsyncSession, user_id, item_data: dict, images: List[bytes]
+) -> ItemModel:
     # new_item = Item(**item_data, **{f"image_url{i+1}": url for i, url in enumerate(image_urls)})
     new_item = ItemModel(
-        name=item_data.get('name'), 
-        price=item_data.get('price'),
-        description=item_data.get('description'),
-        precaution=item_data.get('precaution'), 
-        available=True, 
+        name=item_data.get("name"),
+        price=item_data.get("price"),
+        description=item_data.get("description"),
+        precaution=item_data.get("precaution"),
+        available=True,
         owner_id=user_id,
-        **{f"image_url{i+1}": url for i, url in enumerate(item_data.get('image_urls'))})
+        **{f"image_url{i+1}": url for i, url in enumerate(item_data.get("image_urls"))},
+    )
     db.add(new_item)
     await db.flush()
-    for group_id in item_data.get('group_ids'):
-        new_group_item = GroupItemModel(
-            group_id=group_id,
-            item_id=new_item.id
-        )
+    for group_id in item_data.get("group_ids"):
+        new_group_item = GroupItemModel(group_id=group_id, item_id=new_item.id)
         db.add(new_group_item)
     await db.commit()
     await db.refresh(new_item)
     return new_item
 
+
 async def get_rental_item_list(db: AsyncSession, user_id: int):
-    rent_log_result = await db.execute(
-        select(RentLog)
-    )
+    rent_log_result = await db.execute(select(RentLog))
+    return rent_log_result

@@ -64,10 +64,10 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
         };
         fetchData();
         // if (rentalItem && rentalItem.owner_id !== undefined) {
-            
+
         // }
     }, []);
-    
+
     useEffect(() => {
         Animated.parallel([
             Animated.timing(overlayY, {
@@ -148,7 +148,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, 
+        <SafeAreaView style={{ flex: 1,
             flexDirection: 'column',
             justifyContent: 'flex-start' }}>
             <ScrollView>
@@ -166,8 +166,8 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                     )}
                 />
                 <View
-                    style={{ 
-                        flex: 1, 
+                    style={{
+                        flex: 1,
                         padding: 20,
                     }}
                 >
@@ -186,7 +186,7 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                             style={[styles.title, { marginVertical: 5, fontSize: 20 }]}
                             >注意事項</Text>
                         <View
-                            style={{ 
+                            style={{
                                 padding: 10,
                                 backgroundColor: 'lightgray',
                                 borderRadius: 8,
@@ -258,9 +258,9 @@ export function DetailsScreen({ route, navigation }: { route: any, navigation: a
                         opacity: overlayOpacity,
                     }}>
                         <TouchableWithoutFeedback>
-                            <Animated.View style={{ 
+                            <Animated.View style={{
                                 transform: [{ translateY: overlayY }],
-                                height: '50%', 
+                                height: '50%',
                                 backgroundColor: 'white',
                                 borderTopStartRadius: 25,
                                 borderTopEndRadius: 25,

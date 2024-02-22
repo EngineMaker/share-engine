@@ -265,9 +265,9 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
     location    = google_cloud_run_v2_service.backend_api.location
     project     = google_cloud_run_v2_service.backend_api.project
     service     = google_cloud_run_v2_service.backend_api.name
- 
+
     policy_data = data.google_iam_policy.noauth.policy_data
-} 
+}
 
 resource "google_artifact_registry_repository_iam_member" "pull" {
   project = google_artifact_registry_repository.backend.project
