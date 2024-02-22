@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
-from db.database import get_session
 from models.user import User as UserModel
 from models.user_group import UserGroup as UserGroupModel
 from models.rent_log import RentLog
@@ -23,11 +22,11 @@ async def get_detail(db: AsyncSession, user_id: int):
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # 自分が借りているアイテム一覧の取得
     rent_logs = await db.execute(
         select(RentLog)
-        .where(RentLog.renter_id == user_id, RentLog.returned == False)
+        .where(RentLog.renter_id == user_id, RentLog.returned is False)
         .options(joinedload(RentLog.item))
     )
     rent_logs = rent_logs.scalars().all()
@@ -41,9 +40,10 @@ async def get_detail(db: AsyncSession, user_id: int):
                 "available": item.available,
                 "price": item.price,
                 "image_url1": item.image_url1,
-                "owner_id": user.id
+                "owner_id": user.id,
             }
-            for item in user.items if user.items
+            for item in user.items
+            if user.items
         ],
         rent_items=[
             {
@@ -52,15 +52,16 @@ async def get_detail(db: AsyncSession, user_id: int):
                 "available": rent_log.item.available,
                 "price": rent_log.item.price,
                 "image_url1": rent_log.item.image_url1,
-                "owner_id": rent_log.item.owner_id
+                "owner_id": rent_log.item.owner_id,
             }
-            for rent_log in rent_logs if rent_logs
-        ]
+            for rent_log in rent_logs
+            if rent_logs
+        ],
     )
     return user_detail
 
-async def get_groups(db: AsyncSession, user_id: int):
 
+async def get_groups(db: AsyncSession, user_id: int):
     result = await db.execute(
         select(UserModel)
         .where(UserModel.id == user_id)
