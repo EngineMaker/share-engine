@@ -78,7 +78,7 @@ const ProfileScreen = (navigation: any) => {
       console.error('Error getting user ID:', error);
     }
   }
-  
+
   const handleLogout = async () => {
     console.log('Logging out');
     await removeSecureItem('userid');
@@ -142,7 +142,7 @@ const ProfileScreen = (navigation: any) => {
       /> */}
           <TouchableOpacity
             onPress={() => handleLogout()}
-            style={{ 
+            style={{
                 backgroundColor: 'lightgreen',
                 position: 'absolute',
                 top: 40,

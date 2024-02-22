@@ -1,6 +1,7 @@
 from google.cloud import storage
 import google.auth
 
+
 # GCSへのアップロード関数
 def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
     # 認証情報を設定

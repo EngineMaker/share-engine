@@ -3,12 +3,6 @@ from routes import user, item, auth, file
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from models.user import User
-from models.group import Group
-from models.user_group import UserGroup
-from models.item import Item
-from models.group_item import GroupItem
-from models.rent_log import RentLog
 
 app = FastAPI()
 
@@ -17,7 +11,7 @@ app.add_middleware(
     allow_origins=[os.environ.get("ORIGIN", "")],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 api_prefix = "/api/v1"
@@ -26,11 +20,12 @@ app.include_router(item.router, prefix=api_prefix)
 app.include_router(auth.router, prefix=api_prefix)
 app.include_router(file.router, prefix=api_prefix)
 
+
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
 
+
 @app.get("/health")
 def health():
     return {200: "OK!"}
-

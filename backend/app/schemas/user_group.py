@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class UserGroupBase(BaseModel):
@@ -7,10 +6,11 @@ class UserGroupBase(BaseModel):
     group_id: int
     is_admin: bool = False
 
+
 class UserGroupCreate(UserGroupBase):
     pass
+
 
 class UserGroup(UserGroupBase):
     class Config:
         orm_mode = True
-

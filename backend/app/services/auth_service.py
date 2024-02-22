@@ -1,7 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-import jwt, os
+import jwt
+import os
 from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime, timedelta
@@ -17,6 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ALGORITHM = os.environ.get("HASH_ALGORITHM")
 
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
@@ -26,6 +28,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 def verify_access_token(token: str, credentials_exception):
     try:
@@ -37,15 +40,14 @@ def verify_access_token(token: str, credentials_exception):
     except jwt.PyJWTError:
         raise credentials_exception
 
+
 def hash_password(password: str):
     return pwd_context.hash(password)
 
+
 async def authenticate_user(db: AsyncSession, username: str, password: str) -> User:
     # データベースからユーザーを検索
-    result = await db.execute(
-        select(User)
-        .where(User.name == username)
-    )
+    result = await db.execute(select(User).where(User.name == username))
     user = result.scalars().first()
     # ユーザーが見つかり、パスワードが一致する場合にユーザーを返す
     if user and pwd_context.verify(password, user.hashed_password):
@@ -56,6 +58,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str) -> U
 class TokenData(BaseModel):
     username: Optional[str] = None
     user_id: Optional[int] = None
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     credentials_exception = HTTPException(

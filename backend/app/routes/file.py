@@ -1,7 +1,8 @@
-from fastapi import FastAPI, File, UploadFile, APIRouter
+from fastapi import UploadFile, APIRouter
 from services.file_service import upload_to_gcs
 
 router = APIRouter()
+
 
 @router.post("/uploadfiles/")
 async def create_upload_files(files: list[UploadFile]):

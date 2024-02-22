@@ -2,8 +2,10 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class RentLogCreate(BaseModel):
     item_id: int
+
 
 class RentLogResponse(BaseModel):
     id: int

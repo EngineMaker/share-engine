@@ -123,7 +123,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
             <CustomButton
                 style={{ width: 98, minHeight:30, marginTop: 10, backgroundColor: '#D7D7D7', borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}
                 title={'Login'}
-                textStyle={{ 
+                textStyle={{
                     color: 'black',
                     fontSize: 20,
                     textAlign: 'center',
@@ -150,7 +150,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 <CustomButton
                     style={{ width: 98, minHeight:30, marginTop: 5, borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}
                     title={'Sign up'}
-                    textStyle={{ 
+                    textStyle={{
                         color: 'blue',
                         fontSize: 20,
                         textAlign: 'center',
