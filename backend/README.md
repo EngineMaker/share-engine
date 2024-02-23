@@ -24,3 +24,25 @@ docker compose run api scripts/generate.sh
 ```
 
 `out`フォルダに出力されます
+
+## ローカルから画像のアップロードする方法
+awsコマンドを使うので事前にaws cliをインストールしてください。
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+ストレージに画像アップロードするためにawsクレデンシャルを設定します
+
+```
+aws configure --profile <プロファイル名>
+```
+
+backendディレクトリ直下に.envファイルを作ります
+
+```
+cat << EOF > .env
+AWS_PROFILE_NAME=<プロファイル名>
+AWS_ENDPOINT_URL_S3=<ストレージ画像のエンドポイント>
+EOF
+```
+
+その後サーバーを起動してください
+
