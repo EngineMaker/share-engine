@@ -3,8 +3,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'backend/*'
+    # TODO検証が終わったら戻す
+    # paths:
+    #   - 'backend/*'
 jobs:
   deploy:
     name: Deploy app
