@@ -5,7 +5,7 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./scripts:/app/scripts:cached
-      - ~/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json:cached
+      - ~/.aws:/root/.aws
       - ./out:/app/out
     ports:
       - "8000:80"
@@ -13,6 +13,9 @@ services:
       - DATABASE_URL=postgresql+asyncpg://enginemaker:password@db:5432/shareengine
       - JWT_SECRET_KEY=CompaniesOverCountries
       - HASH_ALGORITHM=HS256
+      - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
+      - AWS_ENDPOINT_URL_S3=${AWS_ENDPOINT_URL_S3}
+      - IMAGE_HOSTNAME=${IMAGE_HOSTNAME}
     depends_on:
       - db
   db:

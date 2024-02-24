@@ -1,18 +1,32 @@
-from google.cloud import storage
-import google.auth
+import boto3
+import mimetypes
+import os
+import logging
+logger = logging.getLogger(__name__)
 
-# GCSへのアップロード関数
-def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
-    # 認証情報を設定
-    credentials, project = google.auth.default()
-    storage_client = storage.Client(project=project, credentials=credentials)
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
+AWS_ENDPOINT_URL_S3 = os.environ.get("AWS_ENDPOINT_URL_S3")
+IMAGE_HOSTNAME = os.environ.get("IMAGE_HOSTNAME")
+AWS_PROFILE_NAME = os.environ.get("AWS_PROFILE_NAME")
 
-    blob.upload_from_filename(source_file_name)
+if not AWS_ENDPOINT_URL_S3:
+    logger.error("S3バケットのエンドポイントURLが環境変数に設定されていない")
+    raise EnvironmentError("AWS_ENDPOINT_URL_S3 is not found in the environment variables.")
+if not IMAGE_HOSTNAME:
+    logger.error("画像のホスト名が環境変数に設定されていない")
+    raise EnvironmentError("IMAGE_HOSTNAME is not found in the environment variables.")
 
+session_params = {}
+if AWS_PROFILE_NAME:
+    session_params['profile_name'] = AWS_PROFILE_NAME
+session = boto3.Session(**session_params)
+s3_client = session.client('s3', endpoint_url=AWS_ENDPOINT_URL_S3)
+
+# S3へのアップロード関数
+def upload_to_s3(bucket_name, source_file_name, destination_blob_name):
+    mime_type, _ = mimetypes.guess_type(source_file_name)
+    s3_client.upload_file(source_file_name, bucket_name, destination_blob_name, ExtraArgs={'ContentType': mime_type})
     # 公開URLを取得
-    public_url = blob.public_url
+    public_url = f"{IMAGE_HOSTNAME}/{destination_blob_name}"
 
     print(f"File {source_file_name} uploaded to {public_url}.")
 

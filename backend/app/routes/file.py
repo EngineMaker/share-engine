@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from services.file_service import upload_to_gcs
+from services.file_service import upload_to_s3
 
 router = APIRouter()
 
@@ -11,8 +11,8 @@ async def create_upload_files(files: list[UploadFile]):
         file_name = f"/app/tmp/{file.filename}"
         with open(file_name, "wb") as f:
             f.write(contents)
-        # GCSにアップロード
-        url = upload_to_gcs("0f2e37b38fde7385-my-bucket", file_name, file.filename)
+        # S3にアップロード
+        url = upload_to_s3("shareengine-storage", file_name, file.filename)
         urls.append(url)
 
     return {"filenames": urls}
