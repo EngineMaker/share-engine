@@ -16,6 +16,7 @@ services:
       - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
       - AWS_ENDPOINT_URL_S3=${AWS_ENDPOINT_URL_S3}
       - IMAGE_HOSTNAME=${IMAGE_HOSTNAME}
+      - ORIGIN
     depends_on:
       - db
   db:
