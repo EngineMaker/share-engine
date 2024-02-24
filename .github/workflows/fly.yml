@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - main
-    # TODO検証が終わったら戻す
-    # paths:
-    #   - 'backend/*'
+    paths:
+      - 'backend/*'
 jobs:
   deploy:
     name: Deploy app
@@ -14,6 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only backend
+      - run: flyctl deploy backend --remote-only -c backend/fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
