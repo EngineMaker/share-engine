@@ -13,6 +13,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://enginemaker:password@db:5432/shareengine
       - JWT_SECRET_KEY=CompaniesOverCountries
       - HASH_ALGORITHM=HS256
+      - ORIGIN
     depends_on:
       - db
   db:
