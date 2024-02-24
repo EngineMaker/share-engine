@@ -16,6 +16,7 @@ services:
       - IMAGE_HOSTNAME=http://localhost:4566/shareengine-storage
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - ORIGIN
     depends_on:
       - db
   db:
