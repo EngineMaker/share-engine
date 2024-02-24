@@ -1,14 +1,19 @@
 import boto3
 import mimetypes
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 AWS_ENDPOINT_URL_S3 = os.environ.get("AWS_ENDPOINT_URL_S3")
 AWS_PROFILE_NAME = os.environ.get("AWS_PROFILE_NAME")
 
+if not AWS_ENDPOINT_URL_S3:
+    logger.error("S3バケットのエンドポイントURLが環境変数に設定されていない")
+    raise EnvironmentError("AWS_ENDPOINT_URL_S3 is not found in the environment variables.")
+
 session_params = {}
 if AWS_PROFILE_NAME:
     session_params['profile_name'] = AWS_PROFILE_NAME
-# 認証プロファイルを設定
 session = boto3.Session(**session_params)
 s3_client = session.client('s3', endpoint_url=AWS_ENDPOINT_URL_S3)
 
