@@ -15,6 +15,7 @@ services:
       - HASH_ALGORITHM=HS256
       - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
       - AWS_ENDPOINT_URL_S3=${AWS_ENDPOINT_URL_S3}
+      - IMAGE_HOSTNAME=${IMAGE_HOSTNAME}
     depends_on:
       - db
   db:

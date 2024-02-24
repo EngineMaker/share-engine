@@ -41,6 +41,7 @@ backendディレクトリ直下に.envファイルを作ります
 cat << EOF > .env
 AWS_PROFILE_NAME=<プロファイル名>
 AWS_ENDPOINT_URL_S3=<ストレージ画像のエンドポイント>
+IMAGE_HOSTNAME=画像ファイルのホスト名
 EOF
 ```
 
