@@ -86,7 +86,7 @@ export const UploadImages = ({
 
     if (result.assets) {
       const newUris = result.assets.map(asset => asset.uri);
-      const newFiles = result.assets.map<Promise<FormDataValue>>(async asset => {
+      const newFiles = result.assets.map<FormDataValue>(asset => {
         console.log('asset.uri: ', asset.uri);
         return {
           name: asset.fileName!,
