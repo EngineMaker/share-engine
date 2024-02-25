@@ -147,7 +147,7 @@ export const loginRequest = async (username: string, password: string) => {
     };
     console.log('Logging in with:', body);
     const method = 'POST';
-    const response = await fetcher('login/', method, body);
+    const response = await fetcher('login', method, body);
     console.log('Response:', response);
     return response;
 }
@@ -196,18 +196,34 @@ export const fetcher = async (url: string, method: string, body?: any, customHea
         "Content-Type": "application/json",
         Authorization: "Bearer " + await getSecureItem('token'),
     };
+
+    const fullURL = `${apiBase}/` + url;
+    console.log('Fetching:', fullURL);
+
     const response = await fetch(`${apiBase}/` + url, {
         method: method,
         headers: customHeaders ? customHeaders : headers,
-        body: JSON.stringify(body),
+        body: body instanceof FormData ? body : JSON.stringify(body),
+        // body: JSON.stringify(body),
     });
     console.log('Status code:', response.status);
     if (response.ok) {
         return response;
     } else {
-        console.log('Error:', response.status);
-        const data = await response.json();
-        console.error('Error:', data);
+        try {
+            const data = await response.json();
+            console.log('Error JSON:', data);
+        } catch (error) {
+            // console.log((error as any).text());
+            // const responseText = await response.text();
+            // console.log('Error text:', responseText);
+            console.log('Error:', response);
+            if (response.blob) {
+                const blob = await response.blob();
+                console.log('ErrorBlob:', blob);
+            }
+            console.log('ErrorJSONstringify:', JSON.stringify(response));
+        }
         return response;
     }
 }
