@@ -26,7 +26,7 @@ const PublishScreen = ({navigation}: {navigation: any}) => {
   const [loanAmount, setLoanAmount] = useState('');
 
   const [imageUris, setImageUris] = useState<string[] | null>(null);
-  const [imageFiles, setImageFiles] = useState<File[] | null>(null);
+  const [imageFiles, setImageFiles] = useState<FormDataValue[] | null>(null);
   const daysArray = Array.from({length: 30}, (_, i) => i + 1);
 
   const saveItem = async () => {

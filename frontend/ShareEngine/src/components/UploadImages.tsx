@@ -28,7 +28,7 @@ export const UploadImages = ({
 }: {
   images: string[] | null;
   setImages: React.Dispatch<React.SetStateAction<string[] | null>>;
-  setImageFiles: React.Dispatch<React.SetStateAction<File[] | null>>;
+  setImageFiles: React.Dispatch<React.SetStateAction<FormDataValue[] | null>>;
 }) => {
   const options = ['写真を撮る', 'フォトライブラリから選択', 'キャンセル'];
 
@@ -86,13 +86,13 @@ export const UploadImages = ({
 
     if (result.assets) {
       const newUris = result.assets.map(asset => asset.uri);
-      const newFiles = result.assets.map(async asset => {
+      const newFiles = result.assets.map<Promise<FormDataValue>>(async asset => {
         console.log('asset.uri: ', asset.uri);
-        const response = await fetch(asset.uri as string);
-        return new File([await response.blob()], asset.fileName, {
-          type: 'image/png',
-          lastModified: new Date().getTime(),
-        });
+        return {
+          name: asset.fileName!,
+          type: asset.type!,
+          uri: asset.uri!,
+        };
       });
 
       const resolvedFiles = await Promise.all(newFiles);

@@ -169,7 +169,7 @@ interface UploadFileProps {
     // headers: any;
 }
   
-export const postImagesRequest = async (files: File[]) => {
+export const postImagesRequest = async (files: FormDataValue[]) => {
     console.log('files:', files);
 
     let formData = new FormData();
