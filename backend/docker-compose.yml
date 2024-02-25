@@ -5,13 +5,18 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./scripts:/app/scripts:cached
-      - ./credential.json:/app/credential.json:cached
+      - ./out:/app/out
     ports:
       - "8000:80"
     environment:
       - DATABASE_URL=postgresql+asyncpg://enginemaker:password@db:5432/shareengine
       - JWT_SECRET_KEY=CompaniesOverCountries
       - HASH_ALGORITHM=HS256
+      - AWS_ENDPOINT_URL_S3=http://localstack:4566
+      - IMAGE_HOSTNAME=http://localhost:4566/shareengine-storage
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - ORIGIN
     depends_on:
       - db
   db:
@@ -24,6 +29,15 @@ services:
       POSTGRES_DB: shareengine
     ports:
       - 5433:5432
+  localstack:
+    image: localstack/localstack:s3-latest
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - AWS_ENDPOINT_URL_S3=http://localstack:4566
+    volumes:
+      - "./s3/init.py:/etc/localstack/init/ready.d/init-s3.py"
 
 volumes:
   postgres_data:

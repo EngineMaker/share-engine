@@ -32,3 +32,5 @@ archive.zip
 
 credential.*
 credentials.*
+out
+.env
