@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     subtitle: {
-        fontSize: 18,
+        fontSize: 17,
     },
     paragraph: {
         fontSize: 16,

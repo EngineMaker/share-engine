@@ -11,7 +11,7 @@ import {
 import {HorizontalList} from '../components/HorizontalScrollList';
 import {dummyItems} from '../dummyItems';
 import { ItemDetailedProps, ItemProps } from '../components/Item';
-import { fetchUserRequest, getUserID, handleLogout, removeSecureItem } from '../Utils';
+import { fetchUserDetailsRequest, getUserID, handleLogout, removeSecureItem } from '../Utils';
 import { CustomButton } from '../components/SmallComponents';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -57,7 +57,7 @@ const ProfileScreen = (navigation: any) => {
     //   // handleLogout(navigation);
     //   return;
     // }
-    await fetchUserRequest(user_id).then((res) => {
+    await fetchUserDetailsRequest(user_id).then((res) => {
       console.log('Fetched user:', res);
       setUser({
         name: res.name,
