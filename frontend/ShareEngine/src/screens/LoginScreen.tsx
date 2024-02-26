@@ -65,7 +65,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                         setSecureItem('token', data.access_token).then(() => {
                             setToken(data.access_token);
                         });
-                        setSecureItem('userid', data.user_id).then(() => {
+                        setSecureItem('userid', `${data.user_id}`).then(() => {
                             setUserID(data.user_id.toString());
                         });
                         setLoggedIn(true);
